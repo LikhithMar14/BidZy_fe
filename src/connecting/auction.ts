@@ -21,3 +21,4 @@ export const createAuction = async (auction: AuctionRequest): Promise<AuctionRes
         throw new Error(err.response.data.message)
     }
 }
+

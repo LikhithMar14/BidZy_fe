@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import Cookies from 'js-cookie'
+import { getToken } from './cookie-utils'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
 
@@ -9,14 +10,10 @@ export const api = axios.create({
     withCredentials: true,
 })
 
-api.interceptors.request.use((config: any) => {
-    if(Cookies.get('auth_token')) {
-        console.log("AUTH TOKEN FOUND")
-        config.headers.Authorization = `Bearer ${Cookies.get('auth_token')}`
-    }
-    else {
-        console.log("NO AUTH TOKEN FOUND")
-        config.headers.Authorization = `Bearer ${Cookies.get('token')}`
+api.interceptors.request.use(async (config: any) => {
+    const token = await getToken()
+    if(token) {
+        config.headers.Authorization = `Bearer ${token}`
     }
     return config
 })
