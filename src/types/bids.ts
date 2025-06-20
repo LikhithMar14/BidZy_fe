@@ -7,3 +7,7 @@ export interface Bid {
     bidderName:string,
 }
 
+export interface BidData {
+    data: Bid[],
+}
+

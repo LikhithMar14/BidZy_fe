@@ -25,3 +25,7 @@ export async function getIsNewUser() {
   const isNewUser = (await cookies()).get('is_new_user')
   return isNewUser?.value === 'true'
 }
+
+export async function deleteCookieFromServer(name: string) {
+  (await cookies()).delete(name)
+}

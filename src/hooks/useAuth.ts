@@ -7,6 +7,17 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
 
+export const useAuth = () => {
+    const { user, token, isAuthenticated, login, logout } = useAuthStore()
+    
+    return {
+        user,
+        token,
+        isAuthenticated,
+        login,
+        logout
+    }
+}
 
 export const useLogin = () => {
     const queryClient = useQueryClient()

@@ -1,0 +1,75 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="background" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#e2e8f0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cbd5e1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gavel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f43f5e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="url(#background)" rx="12"/>
+  
+  <!-- Decorative pattern -->
+  <pattern id="dots" patternUnits="userSpaceOnUse" width="20" height="20">
+    <circle cx="10" cy="10" r="1" fill="#94a3b8" opacity="0.3"/>
+  </pattern>
+  <rect width="300" height="200" fill="url(#dots)" rx="12"/>
+  
+  <!-- Main gavel icon -->
+  <g transform="translate(130, 70)">
+    <circle cx="20" cy="20" r="35" fill="url(#gavel)" opacity="0.1" filter="url(#shadow)"/>
+    <!-- Gavel handle -->
+    <rect x="8" y="25" width="24" height="4" rx="2" fill="url(#gavel)" transform="rotate(-45 20 27)"/>
+    <!-- Gavel head -->
+    <rect x="15" y="10" width="10" height="8" rx="2" fill="url(#gavel)" transform="rotate(-45 20 14)"/>
+    <rect x="12" y="13" width="16" height="4" rx="2" fill="url(#gavel)" transform="rotate(-45 20 15)"/>
+  </g>
+  
+  <!-- Decorative sparkles -->
+  <g fill="url(#sparkle)">
+    <circle cx="80" cy="50" r="3" opacity="0.8">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="220" cy="40" r="2" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.9;0.3" dur="1.8s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="70" cy="130" r="2.5" opacity="0.7">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2.2s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+    <circle cx="230" cy="120" r="2" opacity="0.8">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.6s" repeatCount="indefinite" begin="1.2s"/>
+    </circle>
+  </g>
+  
+  <!-- Star decorations -->
+  <g fill="url(#sparkle)" opacity="0.6">
+    <polygon points="100,30 102,36 108,36 103,40 105,46 100,42 95,46 97,40 92,36 98,36" transform="scale(0.8)">
+      <animateTransform attributeName="transform" type="rotate" values="0 100 38;360 100 38" dur="8s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="200,140 202,146 208,146 203,150 205,156 200,152 195,156 197,150 192,146 198,146" transform="scale(0.6)">
+      <animateTransform attributeName="transform" type="rotate" values="360 200 148;0 200 148" dur="10s" repeatCount="indefinite"/>
+    </polygon>
+  </g>
+  
+  <!-- Text -->
+  <text x="150" y="160" text-anchor="middle" fill="#64748b" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600">
+    Auction Item
+  </text>
+  <text x="150" y="175" text-anchor="middle" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="12">
+    No image available
+  </text>
+</svg> 

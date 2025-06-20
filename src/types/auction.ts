@@ -21,17 +21,18 @@ export interface AuctionResponse {
     title: string;
     description: string;
     startingPrice: number;
-    currentPrice: number;
+    CurrentPrice: number;
     highestBidder: string;
-    clientCount: number;
+    ClientCount: number;
     isActive: boolean;
-    status: Status; 
-    startTime: string;
-    endTime: string;
+    Status: Status; 
+    StartTime: string;
+    EndTime: string;
     increment: number;
     image: string;
     user: User;
     categoryIds: number[];
+    WinnerName: string;
     participants: Participant[];
 }
 
@@ -49,4 +50,46 @@ export interface AuctionRequest {
     startDateTime: string; 
     endDateTime: string;   
     status: Status; 
+}
+
+export interface AuctionData {
+    data: AuctionResponse[],
+}   
+
+export interface CreateAuctionRequest {
+    title: string,
+    description:string,
+    startingPrice:number,
+    increment:number,
+    duration:number,
+    userId:string,
+    image:string,
+    categoryIds: number[],
+    startDateTime:string,
+    endDateTime:string,
+    status:Status,
+}
+
+export enum Category {
+    ART = 1,
+    COLLECTIBLES = 2,
+    ELECTRONICS = 3,
+    FASHION = 4,
+    HOME = 5,
+    OTHER = 6,
+}
+
+export interface ImageUploadRequest {
+    fileName: string;
+    contentType: string;
+    auctionId: string;
+}
+
+export interface ImageUploadResponse {
+    success: boolean;
+    data: {
+        uploadUrl: string;
+        imageKey: string;
+        imageUrl: string;
+    };
 }
