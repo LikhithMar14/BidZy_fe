@@ -16,20 +16,27 @@ export interface Participant {
     updated_at?:string
 }
 
+export interface Bid {
+    senderId: string;
+    price: number;
+    timestamp: string;
+    userName?: string;
+}
+
 export interface AuctionResponse {
-    auctionId: string;
-    title: string;
-    description: string;
-    startingPrice: number;
+    ID: string;
+    Title: string;
+    Description: string;
+    StartingPrice: number;
     CurrentPrice: number;
     highestBidder: string;
     ClientCount: number;
     isActive: boolean;
     Status: Status; 
-    StartTime: string;
-    EndTime: string;
-    increment: number;
-    image: string;
+    StartDate: string;
+    EndDate: string;
+    Increment: number;
+    Image: string;
     user: User;
     categoryIds: number[];
     WinnerName: string;

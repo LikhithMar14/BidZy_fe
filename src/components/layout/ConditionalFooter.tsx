@@ -12,7 +12,11 @@ const ConditionalFooter = () => {
     "/auth/signup", 
     "/auth/callback",
     "/auth/reset-password",
-    "/auth/verify-email"
+    "/auth/verify-email",
+    "/dashboard",
+    "/create-auction",
+    "/auction/:id",
+    "/auction/"
   ];
 
   const shouldShowFooter = !excludeFooterPaths.some(path => pathname.startsWith(path));

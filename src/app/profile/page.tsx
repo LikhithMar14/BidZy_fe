@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
   Gavel,
@@ -31,12 +31,33 @@ import {
   BadgeCheck,
   Gem,
   Zap,
+  ArrowRight,
+  Timer,
+  History,
+  Flame,
+  CheckCircle,
+  AlertCircle,
+  Plus,
+  TrendingDown,
+  BarChart3,
+  PieChart,
+  LineChart,
 } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getUserInfo, getUserStats, getAuctionsOfUser, getBidsOfUser, getParticipatedAuctions } from "@/connecting/user";
-import { AuctionResponse } from "@/types/auction";
+import { AuctionResponse, Status, Category } from "@/types/auction";
 import { Bid } from "@/types/bids";
+
+const categories = {
+  [Category.ART]: { name: "Art", icon: "🎨", color: "from-rose-500 to-pink-600" },
+  [Category.COLLECTIBLES]: { name: "Collectibles", icon: "🏆", color: "from-amber-500 to-orange-600" },
+  [Category.ELECTRONICS]: { name: "Electronics", icon: "📱", color: "from-violet-500 to-purple-600" },
+  [Category.FASHION]: { name: "Fashion", icon: "👗", color: "from-emerald-500 to-teal-600" },
+  [Category.HOME]: { name: "Home", icon: "🏠", color: "from-blue-500 to-cyan-600" },
+  [Category.OTHER]: { name: "Other", icon: "📦", color: "from-gray-500 to-slate-600" },
+};
 
 
 // Optimized React Query hooks with better caching and error handling
@@ -304,15 +325,15 @@ const BidCard = ({ bid }: BidCardProps) => (
             </div>
             <div>
               <p className="font-semibold text-gray-900">${bid.amount.toLocaleString()}</p>
-              <p className="text-sm text-gray-600">Auction ID: {bid.auctionId.slice(0, 8)}...</p>
+              <p className="text-sm text-gray-600">Bid ID: {bid.bid_id.slice(0, 8)}...</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-500">
-              {new Date(bid.createdAt || "").toLocaleDateString()}
+              {new Date(bid.created_at || "").toLocaleDateString()}
             </p>
             <p className="text-xs text-gray-400">
-              {new Date(bid.createdAt || "").toLocaleTimeString()}
+              {new Date(bid.created_at || "").toLocaleTimeString()}
             </p>
           </div>
         </div>

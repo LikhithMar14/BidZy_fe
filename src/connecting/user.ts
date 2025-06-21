@@ -17,10 +17,11 @@ export const getUserInfo = async(): Promise<UserData | undefined>  => {
 export const getAuctionsOfUser = async(): Promise<AuctionData | undefined> => {
     try {
         const response = await api.get('/users/auctions')
+
         return response.data as AuctionData
     }catch(err:any) {
-        console.log(`Error while getting auctions of an user ${err.response.data.message}`)
-        throw new Error(err.response.data.message)
+        console.log(`Error while getting auctions of an user ${err.response?.data?.message || err.message}`)
+        throw new Error(err.response?.data?.message || err.message)
     }
 }
 
@@ -48,9 +49,10 @@ export const getUserStats = async(): Promise<UserStats | undefined> => {
 export const getParticipatedAuctions = async(): Promise<AuctionData | undefined> => {
     try {
         const response = await api.get('/users/participated-auctions')
+
         return response.data as AuctionData
     }catch(err:any) {
-        console.log(`Error while getting participated auctions of an user ${err.response.data.message}`)
-        throw new Error(err.response.data.message)
+        console.log(`Error while getting participated auctions of an user ${err.response?.data?.message || err.message}`)
+        throw new Error(err.response?.data?.message || err.message)
     }
 }

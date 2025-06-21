@@ -128,7 +128,7 @@ export default function CreateAuctionPage() {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      if (file.size > 10 * 1024 * 1024) { 
         toast.error("Image size must be less than 10MB");
         return;
       }
