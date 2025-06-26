@@ -58,6 +58,7 @@ import {
 import { useAuthStore } from "@/lib/auth";
 import { GraffitiCongratulations } from "@/components/ui/congratulations";
 import LiveBiddingChart from "@/components/auction/LiveBiddingChart";
+import AuctionRoom from "@/components/auction/AuctionRoom";
 
 const categories = {
   [Category.ART]: { name: "Art", icon: "🎨", color: "from-rose-500 to-pink-600" },
@@ -1141,6 +1142,23 @@ export default function AuctionPage() {
              isActive={isAuctionActive}
            />
          </motion.div>
+
+        {/* LiveKit Video Integration */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-6"
+        >
+          <AuctionRoom 
+            auctionId={auction.ID}
+            userName={user?.user_name}
+            userId={user?.id}
+            isActive={isAuctionActive}
+            participants={currentParticipants}
+            token={user?.token}
+          />
+        </motion.div>
 
         {/* Bottom Section - Bids & Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">

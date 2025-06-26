@@ -223,12 +223,12 @@ class WebSocketClient {
         };
 
         this.ws!.onerror = (error) => {
-          console.error('🚨 WebSocket error:', {
-            error,
-            url,
-            readyState: this.ws?.readyState,
-            connection: enhancedConnection
-          });
+          // console.error('🚨 WebSocket error:', {
+          //   error,
+          //   url,
+          //   readyState: this.ws?.readyState,
+          //   connection: enhancedConnection
+          // });
           clearTimeout(connectionTimeout);
           this.isConnecting = false;
           this.emit('error', `Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);

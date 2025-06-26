@@ -103,8 +103,8 @@ export const useAuctionWebSocket = (): UseAuctionWebSocketReturn => {
 
     // Error event
     const onError = (message: string) => {
-      setConnectionError(message);
-      console.error('WebSocket error:', message);
+      // setConnectionError(message);
+      // console.error('WebSocket error:', message);
     };
     auctionWebSocket.on('error', onError);
     cleanupFunctions.push(() => auctionWebSocket.off('error', onError));

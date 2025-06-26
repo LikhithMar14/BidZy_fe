@@ -10,12 +10,18 @@ import { Input } from '../ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { Video, VideoOff, Maximize2, Minimize2 } from 'lucide-react';
+import AuctionVideoRoom from './AuctionVideoRoom';
+import ParticipantsList from './ParticipantsList';
 
 interface AuctionRoomProps {
   auctionId: string;
   token: string;
   userId: string;
   userName: string;
+  isActive: boolean;
+  participants: number;
 }
 
 interface BidLeaderboardEntry {
@@ -30,6 +36,8 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
   token,
   userId,
   userName,
+  isActive,
+  participants,
 }) => {
   const [bidAmount, setBidAmount] = useState<string>('');
   const [isPlacingBid, setIsPlacingBid] = useState(false);
@@ -43,6 +51,9 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
   const [isAuctionActive, setIsAuctionActive] = useState<boolean>(true);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const bidTimelineRef = useRef<HTMLDivElement>(null);
+  const [showVideo, setShowVideo] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [mockParticipants, setMockParticipants] = useState<any[]>([]);
   
   const {
     isConnected,
@@ -234,6 +245,53 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
     return bidder;
   };
 
+  // Generate some mock participants data for the participants list
+  useEffect(() => {
+    if (userName && userId) {
+      const currentUser = {
+        id: userId,
+        name: userName,
+        isActive: true,
+        hasVideo: true,
+        hasAudio: true,
+        isSpeaking: false
+      };
+      
+      // Generate random participants based on the participants count
+      const otherParticipants = Array.from({ length: Math.min(participants - 1, 10) }, (_, i) => ({
+        id: `participant-${i}`,
+        name: `User ${i + 1}`,
+        isActive: Math.random() > 0.2, // 80% chance of being active
+        hasVideo: Math.random() > 0.4, // 60% chance of having video
+        hasAudio: Math.random() > 0.3, // 70% chance of having audio
+        isSpeaking: i === 0 && Math.random() > 0.7 // First user might be speaking
+      }));
+      
+      setMockParticipants([currentUser, ...otherParticipants]);
+    } else {
+      // If no user, just generate mock participants
+      const randomParticipants = Array.from({ length: Math.min(participants, 10) }, (_, i) => ({
+        id: `participant-${i}`,
+        name: `User ${i + 1}`,
+        isActive: Math.random() > 0.2,
+        hasVideo: Math.random() > 0.4,
+        hasAudio: Math.random() > 0.3,
+        isSpeaking: i === 0 && Math.random() > 0.7
+      }));
+      
+      setMockParticipants(randomParticipants);
+    }
+  }, [participants, userName, userId]);
+
+  const toggleVideo = () => {
+    setShowVideo(!showVideo);
+    toast.info(showVideo ? 'Video paused' : 'Video resumed');
+  };
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   if (isConnecting) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -250,327 +308,80 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {/* Hero Section with Live Stats */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-8 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold mb-2">
-                ${liveBids.length > 0 ? liveBids[liveBids.length - 1].amount.toFixed(2) : (auctionData?.startingPrice?.toFixed(2) || '0.00')}
-              </div>
-              <div className="text-sm opacity-90">Current Highest</div>
-              {currentLeader && (
-                <div className="text-xs mt-1 px-2 py-1 bg-white/20 rounded-full inline-block">
-                  🏆 {getBidderDisplayName(currentLeader)}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`${isExpanded ? 'fixed inset-0 z-50 p-4 bg-black/80' : ''}`}
+    >
+      <Card className={`border-0 shadow-lg overflow-hidden ${
+        isExpanded ? 'h-full max-w-6xl mx-auto' : ''
+      }`}>
+        <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center">
+              <Video className="w-5 h-5 mr-2" />
+              Live Auction Room
+            </CardTitle>
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-white hover:bg-white/20"
+                onClick={toggleVideo}
+              >
+                {showVideo ? <VideoOff className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-white hover:bg-white/20"
+                onClick={toggleExpand}
+              >
+                {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="p-0">
+          <div className={`grid ${isExpanded ? 'grid-cols-1 lg:grid-cols-4' : 'grid-cols-1'} gap-0`}>
+            {/* Main video area */}
+            <div className={`${isExpanded ? 'lg:col-span-3' : ''} ${showVideo ? '' : 'hidden'}`}>
+              <AuctionVideoRoom
+                auctionId={auctionId}
+                userName={userName}
+                isActive={isActive}
+                participants={participants}
+              />
+            </div>
+            
+            {/* Participants sidebar */}
+            <div className={`${showVideo && isExpanded ? 'border-l border-gray-200' : ''} p-4 bg-gray-50`}>
+              <ParticipantsList 
+                participants={mockParticipants} 
+                maxDisplayed={isExpanded ? 15 : 5}
+                currentUserId={userId}
+              />
+              
+              {!isExpanded && (
+                <div className="mt-4 text-center">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={toggleExpand}
+                    className="w-full"
+                  >
+                    <Maximize2 className="w-4 h-4 mr-2" />
+                    Expand View
+                  </Button>
                 </div>
-              )}
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-2">{liveBids.length}</div>
-              <div className="text-sm opacity-90">Total Bids</div>
-              {isPolling && (
-                <div className="text-xs mt-1 flex items-center justify-center gap-1">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  Live Updates
-                </div>
-              )}
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-2">{participantCount}</div>
-              <div className="text-sm opacity-90">Active Bidders</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-2">{bidStreak}</div>
-              <div className="text-sm opacity-90">Your Streak</div>
-              {bidStreak > 0 && (
-                <div className="text-xs mt-1">🔥 On Fire!</div>
               )}
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Auction Info & Bidding */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Auction Information */}
-          {auctionData && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>{auctionData.title || 'Live Auction'}</span>
-                  <Badge 
-                    variant={auctionData.isActive ? "default" : "secondary"}
-                    className={auctionData.isActive ? "animate-pulse" : ""}
-                  >
-                    {auctionData.isActive ? "🔴 LIVE" : "Ended"}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Starting Price</p>
-                    <p className="text-lg font-semibold">
-                      ${auctionData.startingPrice?.toFixed(2) || '0.00'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Min Increment</p>
-                    <p className="text-lg font-semibold">${auctionData.increment}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Connection</p>
-                    <Badge variant={isConnected ? "default" : "destructive"}>
-                      {isConnected ? "🟢 Connected" : "🔴 Disconnected"}
-                    </Badge>
-                  </div>
-                </div>
-                
-                {auctionData.description && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Description</p>
-                    <p className="text-sm bg-muted p-3 rounded-lg">{auctionData.description}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Enhanced Bid Placement */}
-          <Card className="border-2 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                🎯 Place Your Bid
-                {bidStreak > 2 && <span className="text-orange-500">🔥</span>}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter bid amount"
-                    value={bidAmount}
-                    onChange={(e) => setBidAmount(e.target.value)}
-                    min={liveBids.length > 0 ? 
-                      liveBids[liveBids.length - 1].amount + (auctionData?.increment || 1) : 
-                      (auctionData?.startingPrice || 0) + (auctionData?.increment || 1)
-                    }
-                    step="0.01"
-                    disabled={!isConnected || isPlacingBid || !isAuctionActive}
-                    className="flex-1 text-lg"
-                  />
-                  <Button
-                    onClick={handlePlaceBid}
-                    disabled={!isConnected || isPlacingBid || !bidAmount || !isAuctionActive}
-                    size="lg"
-                    className="px-8 font-bold"
-                  >
-                    {isPlacingBid ? '🚀 Bidding...' : '💰 BID NOW'}
-                  </Button>
-                </div>
-                
-                {auctionData && liveBids.length > 0 && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Minimum bid: ${(liveBids[liveBids.length - 1].amount + auctionData.increment).toFixed(2)}
-                    </span>
-                    <span className="text-primary font-semibold">
-                      Beat: ${liveBids[liveBids.length - 1].amount.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-                
-                {bidStreak > 0 && (
-                  <div className="text-center">
-                    <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-300">
-                      🔥 Bid Streak: {bidStreak} {bidStreak > 5 ? "- Legendary!" : bidStreak > 3 ? "- Hot!" : ""}
-                    </Badge>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Live Bid Timeline */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  📈 Live Bid Timeline
-                  {isPolling && (
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-                  )}
-                </span>
-                <Badge variant="outline">{liveBids.length} bids</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div 
-                ref={bidTimelineRef}
-                className="space-y-3 max-h-96 overflow-y-auto pr-2"
-              >
-                {liveBids.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <div className="text-4xl mb-2">⏳</div>
-                    <p>Waiting for the first bid...</p>
-                    <p className="text-sm">Be the first to make a move!</p>
-                  </div>
-                ) : (
-                  liveBids.slice().reverse().map((bid, index) => (
-                    <div
-                      key={bid.bid_id}
-                      className={`flex items-center justify-between p-4 rounded-lg transition-all duration-500 ${
-                        index === 0 
-                          ? 'bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 shadow-lg transform scale-105' 
-                          : index === 1 
-                          ? 'bg-yellow-50 border border-yellow-200'
-                          : 'bg-muted/50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {index === 0 && <span className="text-2xl">👑</span>}
-                        {index === 1 && <span className="text-xl">🥈</span>}
-                        {index === 2 && <span className="text-xl">🥉</span>}
-                        <div>
-                          <p className={`font-semibold ${
-                            bid.bidder === userName ? 'text-primary' : ''
-                          }`}>
-                            {getBidderDisplayName(bid.bidder)}
-                            {index === 0 && <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">LEADING</span>}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(bid.created_at).toLocaleTimeString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-xl font-bold ${
-                          index === 0 ? 'text-green-600' : 'text-primary'
-                        }`}>
-                          ${bid.amount.toFixed(2)}
-                        </p>
-                        {index === 0 && (
-                          <p className="text-xs text-green-600 font-medium">Current High</p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Column - Leaderboard & Stats */}
-        <div className="space-y-6">
-          {/* Bidder Leaderboard */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                🏆 Leaderboard
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {bidLeaderboard.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-4">
-                    No bids yet
-                  </p>
-                ) : (
-                  bidLeaderboard.slice(0, 10).map((entry, index) => (
-                    <div
-                      key={entry.bidder}
-                      className={`flex items-center justify-between p-3 rounded-lg ${
-                        entry.bidder === userName ? 'bg-primary/10 border border-primary/20' : 'bg-muted/50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="text-lg">
-                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">
-                            {getBidderDisplayName(entry.bidder)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {entry.totalBids} bid{entry.totalBids !== 1 ? 's' : ''}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-sm">${entry.highestBid.toFixed(2)}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Last: ${entry.latestBid.toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Participants */}
-          {auctionData?.participants && auctionData.participants.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>👥 Active Participants</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {auctionData.participants.map((participant) => (
-                    <Badge 
-                      key={participant.id} 
-                      variant={participant.name === userName ? "default" : "outline"}
-                      className="text-xs"
-                    >
-                      {participant.name === userName ? `${participant.name} (You)` : participant.name}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Quick Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle>📊 Your Stats</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Your Bids</span>
-                  <span className="font-semibold">
-                    {liveBids.filter(bid => bid.bidder === userName).length}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Highest Bid</span>
-                  <span className="font-semibold">
-                    ${Math.max(...liveBids.filter(bid => bid.bidder === userName).map(bid => bid.amount), 0).toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Current Streak</span>
-                  <span className="font-semibold">{bidStreak}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Leading</span>
-                  <span className="font-semibold">
-                    {currentLeader === userName ? '🟢 Yes!' : '🔴 No'}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
