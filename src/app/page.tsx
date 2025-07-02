@@ -88,7 +88,7 @@ export default function HomePage() {
   const stats = [
     { number: "10K+", label: "Active Users", icon: Users },
     { number: "50K+", label: "Auctions Completed", icon: Gavel },
-    { number: "$2M+", label: "Total Value", icon: DollarSign },
+    { number: "₹16.60 Cr+", label: "Total Value", icon: DollarSign },
     { number: "99.9%", label: "Satisfaction Rate", icon: Star },
   ];
 
@@ -136,7 +136,7 @@ export default function HomePage() {
     },
     {
       name: "Pro",
-      price: "$9.99",
+      price: "₹999",
       period: "/month",
       description: "For serious bidders",
       features: [
@@ -151,7 +151,7 @@ export default function HomePage() {
     },
     {
       name: "Enterprise",
-      price: "$29.99",
+      price: "₹2999",
       period: "/month",
       description: "For businesses and dealers",
       features: [
@@ -204,21 +204,21 @@ export default function HomePage() {
   const recentAuctions = [
     {
       title: "Vintage Rolex Submariner",
-      currentBid: "$2,450",
+      currentBid: "₹2,450",
       timeLeft: "02:45:30",
       bidders: 12,
       image: "⌚",
     },
     {
       title: "Original Picasso Sketch",
-      currentBid: "$15,200",
+      currentBid: "₹15,200",
       timeLeft: "01:23:15",
       bidders: 8,
       image: "🎨",
     },
     {
       title: "Antique Persian Rug",
-      currentBid: "$3,800",
+      currentBid: "₹3,800",
       timeLeft: "04:12:45",
       bidders: 15,
       image: "🟫",
@@ -288,7 +288,7 @@ export default function HomePage() {
                   className="bg-gradient-to-r from-white to-gray-100 text-rose-600 hover:from-gray-100 hover:to-white text-base sm:text-lg px-8 py-6 h-auto shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 font-semibold rounded-xl"
                   asChild
                 >
-                  <Link href="/auctions">
+                  <Link href="/dashboard">
                     Start Bidding Now
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
@@ -346,7 +346,7 @@ export default function HomePage() {
                         Current Bid
                       </p>
                       <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
-                        $2,450
+                        ₹2,450
                       </p>
                     </div>
                   </div>
@@ -666,11 +666,10 @@ export default function HomePage() {
                   </div>
                 )}
                 <Card
-                  className={`h-full border-2 ${
-                    plan.popular
+                  className={`h-full border-2 ${plan.popular
                       ? "border-rose-500 shadow-2xl"
                       : "border-gray-200 shadow-lg"
-                  } relative bg-white rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2`}
+                    } relative bg-white rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2`}
                 >
                   <CardHeader className="text-center pb-4 sm:pb-6">
                     <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
@@ -702,18 +701,18 @@ export default function HomePage() {
                       ))}
                     </ul>
                     <Button
-                    asChild
-                    className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-3 sm:py-4 text-base sm:text-lg
-                     shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 rounded-xl"
-                  >
-                    <Link
-                      href="/auth"
+                      asChild
                       className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-3 sm:py-4 text-base sm:text-lg
                      shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 rounded-xl"
                     >
-                      Get Started
-                    </Link>
-                  </Button>
+                      <Link
+                        href="/auth"
+                        className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-3 sm:py-4 text-base sm:text-lg
+                     shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 rounded-xl"
+                      >
+                        Get Started
+                      </Link>
+                    </Button>
 
 
 
@@ -767,9 +766,8 @@ export default function HomePage() {
                         {faq.question}
                       </span>
                       <ChevronDown
-                        className={`w-5 h-5 sm:w-6 sm:h-6 text-gray-500 transition-transform duration-200 ${
-                          activeFAQ === index ? "rotate-180" : ""
-                        }`}
+                        className={`w-5 h-5 sm:w-6 sm:h-6 text-gray-500 transition-transform duration-200 ${activeFAQ === index ? "rotate-180" : ""
+                          }`}
                       />
                     </button>
                     {activeFAQ === index && (
@@ -825,162 +823,19 @@ export default function HomePage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="p-0 border-none bg-transparent">
-  <Link
-    href="/auctions"
-    className="border-2 border-white/30 text-white hover:bg-white hover:text-rose-600 text-base sm:text-lg px-8 py-6 h-auto backdrop-blur-md hover:border-white transition-all duration-300 font-bold rounded-xl flex items-center justify-center"
-  >
-    Browse Auctions
-  </Link>
-</Button>
+                <Link
+                  href="/dashboard"
+                  className="border-2 border-white/30 text-white hover:bg-white hover:text-rose-600 text-base sm:text-lg px-8 py-6 h-auto backdrop-blur-md hover:border-white transition-all duration-300 font-bold rounded-xl flex items-center justify-center"
+                >
+                  Browse Auctions
+                </Link>
+              </Button>
 
 
             </div>
           </motion.div>
         </div>
       </section>
-
-
-      {/* Footer */}
-      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <div className="grid md:grid-cols-4 gap-8 sm:gap-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-rose-500 to-pink-600 rounded-lg flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-lg sm:text-xl">
-                    B
-                  </span>
-                </div>
-                <span className="text-xl sm:text-2xl font-bold">BidZy</span>
-              </div>
-              <p className="text-gray-400 mb-6 sm:mb-8 max-w-md leading-relaxed text-base sm:text-lg">
-                The world's leading online auction platform. Join millions of
-                users buying and selling unique items in real-time auctions.
-              </p>
-              <div className="flex space-x-4 sm:space-x-6">
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 hover:scale-110 transform"
-                >
-                  <Facebook className="w-5 h-5 sm:w-6 sm:h-6" />
-                </a>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 hover:scale-110 transform"
-                >
-                  <Twitter className="w-5 h-5 sm:w-6 sm:h-6" />
-                </a>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 hover:scale-110 transform"
-                >
-                  <Instagram className="w-5 h-5 sm:w-6 sm:h-6" />
-                </a>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors duration-200 hover:scale-110 transform"
-                >
-                  <Linkedin className="w-5 h-5 sm:w-6 sm:h-6" />
-                </a>
-              </div>
-            </div>
-
-
-            <div>
-              <h3 className="font-bold text-lg mb-4 sm:mb-6">Platform</h3>
-              <ul className="space-y-3 sm:space-y-4 text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    How it Works
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    Browse Auctions
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    Create Auction
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    Pricing
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-
-            <div>
-              <h3 className="font-bold text-lg mb-4 sm:mb-6">Support</h3>
-              <ul className="space-y-3 sm:space-y-4 text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    Contact Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200 font-medium"
-                  >
-                    Terms of Service
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-
-          <div className="border-t border-gray-800 mt-10 sm:mt-12 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm sm:text-base">
-              © 2024 BidZy. All rights reserved.
-            </p>
-            <div className="flex items-center mt-4 md:mt-0">
-              <span className="text-gray-400 text-sm sm:text-base mr-2">
-                Made with
-              </span>
-              <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 animate-pulse" />
-              <span className="text-gray-400 text-sm sm:text-base ml-2">
-                for auction enthusiasts
-              </span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

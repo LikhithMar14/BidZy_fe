@@ -54,7 +54,8 @@ function AuthCallbackContent() {
 
       const user = {
         id: userId,
-        username,
+        user_name: username, // Use user_name as primary field
+        username, // Keep username for backward compatibility
         email,
         createdAt: '',
         updatedAt: ''

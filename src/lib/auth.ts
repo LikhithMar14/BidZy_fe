@@ -2,9 +2,8 @@ import { create }  from 'zustand'
 
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-import Cookies from 'js-cookie'
 import { User } from '@/types/user'
-import { clearAuthCookies } from './utils'
+import { clearAuthCookies, deleteCookie, setCookie } from './utils'
 
 export const useAuthStore = create(
     persist(
@@ -14,7 +13,7 @@ export const useAuthStore = create(
             isAuthenticated:false,
 
             login: (userData:User, token:string) => {
-                Cookies.set('auth_token', token , { expires: 7 })
+                setCookie('auth_token', token , 7)
 
                 set({
                     user: userData, 
@@ -23,7 +22,7 @@ export const useAuthStore = create(
                 })
             },
             logout: () => {
-                Cookies.remove('auth_token')
+                deleteCookie('auth_token')
                 clearAuthCookies()
                 set({
                     user:null,
@@ -39,6 +38,7 @@ export const useAuthStore = create(
             name: 'auth-storage',
             partialize: (state:any) => ({
                 user: state?.user,
+                token: state?.token,
                 isAuthenticated: state.isAuthenticated
             })
         }

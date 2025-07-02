@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { deleteCookieFromServer } from "./cookie-utils"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -25,6 +26,7 @@ export function deleteCookie(name: string): void {
 
 export function clearAuthCookies(): void {
   deleteCookie('auth_token')
+  deleteCookieFromServer('auth_token')
   deleteCookie('user_id') 
   deleteCookie('username')
   deleteCookie('email')
