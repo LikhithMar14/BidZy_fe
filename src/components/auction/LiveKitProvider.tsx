@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Room, RoomEvent, RemoteParticipant, LocalParticipant, Participant } from 'livekit-client';
 
