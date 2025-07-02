@@ -44,7 +44,7 @@ function AuthCallbackContent() {
     router.push('/auth/login')
   }, [router])
 
-  const handleAuthSuccess = useCallback(async (userInfo: any, authToken: string) => {
+  const handleAuthSuccess = useCallback(async (userInfo: any, authToken: string, isNewUser: boolean = false) => {
     try {
       const { user_id: userId, user_name: username, email } = userInfo.data
       
@@ -68,8 +68,13 @@ function AuthCallbackContent() {
         deleteCookie('is_new_user')
       ])
 
-      toast.success('Welcome to BidZy!', {
-        description: `Successfully logged in as ${email}`,
+      const welcomeMessage = isNewUser ? 'Welcome to BidZy!' : 'Welcome back!'
+      const description = isNewUser 
+        ? 'Your account has been created successfully.' 
+        : `Successfully logged in as ${email}`
+
+      toast.success(welcomeMessage, {
+        description,
         duration: 2000,
       })
 
@@ -87,6 +92,11 @@ function AuthCallbackContent() {
     if (hasProcessed.current || isProcessing) return
     
     const success = searchParams.get('success')
+    const token = searchParams.get('token')
+    const userId = searchParams.get('user_id')
+    const username = searchParams.get('username')
+    const email = searchParams.get('email')
+    const isNewUser = searchParams.get('is_new_user') === 'true'
     
     if (success !== 'true') {
       handleAuthError(
@@ -100,19 +110,35 @@ function AuthCallbackContent() {
     hasProcessed.current = true
 
     try {
-      const authToken = await getToken()
+      // Get token from URL parameters first, then fallback to cookies
+      let authToken = token || await getToken()
       
       if (!authToken) {
         throw new Error('No authentication token received')
       }
 
-      const userInfo = await fetchUserInfoWithToken(authToken)
-      
-      if (!userInfo) {
-        throw new Error('No user information received')
-      }
+      // If we have user data from URL parameters, use it directly
+      if (userId && username && email) {
+        const user = {
+          id: userId,
+          user_name: username,
+          username,
+          email,
+          createdAt: '',
+          updatedAt: ''
+        }
+        
+        await handleAuthSuccess({ data: user }, authToken, isNewUser)
+      } else {
+        // Fallback to fetching user info from API
+        const userInfo = await fetchUserInfoWithToken(authToken)
+        
+        if (!userInfo) {
+          throw new Error('No user information received')
+        }
 
-      await handleAuthSuccess(userInfo, authToken)
+        await handleAuthSuccess(userInfo, authToken, isNewUser)
+      }
     } catch (error) {
       console.error('Auth processing error:', error)
       handleAuthError(
