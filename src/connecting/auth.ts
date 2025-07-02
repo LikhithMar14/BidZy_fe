@@ -26,6 +26,7 @@ export const signup = async (username: string, email: string, password: string) 
 export const googleLogin = async () => {
     try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+        console.log(`${apiUrl}/auth/google/login`)
         window.location.href = `${apiUrl}/auth/google/login`;
       } catch (err: any) {
         console.log(`Error initiating Google login: ${err.message}`);

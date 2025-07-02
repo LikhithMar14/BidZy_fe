@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuctionWebSocket, useBidHistory } from '../../hooks/useAuctionWebSocket';
-import { AuctionConnection, Bid as LegacyBid } from '../../connecting/ws-singleton';
+import { AuctionConnection, Bid as LegacyBid, auctionWebSocket } from '../../connecting/ws-singleton';
 import { Bid } from '@/types/bids';
 import { getAuctionBidsDataLive } from '@/connecting/auction';
 import { Button } from '../ui/button';
@@ -53,7 +53,9 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
   const bidTimelineRef = useRef<HTMLDivElement>(null);
   const [showVideo, setShowVideo] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [mockParticipants, setMockParticipants] = useState<any[]>([]);
+  
+  // Real participants tracking
+  const [auctionParticipants, setAuctionParticipants] = useState<any[]>([]);
   
   const {
     isConnected,
@@ -71,6 +73,71 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
   } = useAuctionWebSocket();
 
   const { bids, addBid, clearBids } = useBidHistory(20);
+
+  // Track auction participants from WebSocket data
+  useEffect(() => {
+    if (auctionData && auctionData.participants) {
+      // Convert participants from WebSocket data to the format needed by ParticipantsList
+      const formattedParticipants = auctionData.participants.map((participant: any) => ({
+        id: participant.id || participant.senderId || '',
+        name: participant.user_name || participant.userName || 'Anonymous',
+        isActive: true,
+        hasVideo: false, // We don't have this info from WebSocket
+        hasAudio: false, // We don't have this info from WebSocket
+        isSpeaking: false // We don't have this info from WebSocket
+      }));
+      
+      // Add current user if not already in the list
+      if (userId && userName && !formattedParticipants.some(p => p.id === userId)) {
+        formattedParticipants.unshift({
+          id: userId,
+          name: userName,
+          isActive: true,
+          hasVideo: true,
+          hasAudio: true,
+          isSpeaking: false
+        });
+      }
+      
+      setAuctionParticipants(formattedParticipants);
+      console.log('Updated auction participants:', formattedParticipants);
+    }
+  }, [auctionData, userId, userName]);
+
+  // Listen for user joined/left events
+  useEffect(() => {
+    const handleUserJoined = (userId: string, userName: string) => {
+      console.log(`👋 User joined: ${userId} ${userName || ''}`);
+      setAuctionParticipants(prev => {
+        // Don't add duplicates
+        if (prev.some(p => p.id === userId)) return prev;
+        
+        return [...prev, {
+          id: userId,
+          name: userName || 'Anonymous',
+          isActive: true,
+          hasVideo: false,
+          hasAudio: false,
+          isSpeaking: false
+        }];
+      });
+    };
+    
+    const handleUserLeft = (userId: string) => {
+      console.log(`👋 User left: ${userId}`);
+      setAuctionParticipants(prev => prev.filter(p => p.id !== userId));
+    };
+    
+    // Add event listeners to the WebSocket
+    auctionWebSocket.on('userJoined', handleUserJoined);
+    auctionWebSocket.on('userLeft', handleUserLeft);
+    
+    return () => {
+      // Clean up event listeners
+      auctionWebSocket.off('userJoined', handleUserJoined);
+      auctionWebSocket.off('userLeft', handleUserLeft);
+    };
+  }, []);
 
   // Enhanced bid polling function
   const pollBids = useCallback(async () => {
@@ -95,9 +162,9 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
           setCurrentLeader(latestBid.bidder);
           
           // Show exciting toast for new bid
-          toast.success(`🔥 New bid: $${latestBid.amount} by ${latestBid.bidder}!`, {
-            duration: 3000,
-          });
+          // toast.success(`🔥 New bid: HOY HOYE ₹${latestBid.amount} by ${latestBid.bidder}!`, {
+          //   duration: 3000,
+          // });
           
           // Update bid streak for current user
           if (latestBid.bidder === userName) {
@@ -210,7 +277,7 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
     const minBid = currentHighest + (auctionData?.increment || 1);
     
     if (amount < minBid) {
-      toast.error(`Bid must be at least $${minBid.toFixed(2)}`);
+      toast.error(`Bid must be at least ₹${minBid.toFixed(2)}`);
       return;
     }
 
@@ -218,7 +285,7 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
     try {
       const result = placeBid(amount);
       if (result.success) {
-        toast.success(`🚀 Bid placed successfully! $${amount.toFixed(2)}`, {
+        toast.success(`🚀 Bid placed successfully! ₹${amount.toFixed(2)}`, {
           duration: 4000,
         });
         setBidAmount('');
@@ -244,44 +311,6 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
     if (bidder === userName) return `${bidder} (You)`;
     return bidder;
   };
-
-  // Generate some mock participants data for the participants list
-  useEffect(() => {
-    if (userName && userId) {
-      const currentUser = {
-        id: userId,
-        name: userName,
-        isActive: true,
-        hasVideo: true,
-        hasAudio: true,
-        isSpeaking: false
-      };
-      
-      // Generate random participants based on the participants count
-      const otherParticipants = Array.from({ length: Math.min(participants - 1, 10) }, (_, i) => ({
-        id: `participant-${i}`,
-        name: `User ${i + 1}`,
-        isActive: Math.random() > 0.2, // 80% chance of being active
-        hasVideo: Math.random() > 0.4, // 60% chance of having video
-        hasAudio: Math.random() > 0.3, // 70% chance of having audio
-        isSpeaking: i === 0 && Math.random() > 0.7 // First user might be speaking
-      }));
-      
-      setMockParticipants([currentUser, ...otherParticipants]);
-    } else {
-      // If no user, just generate mock participants
-      const randomParticipants = Array.from({ length: Math.min(participants, 10) }, (_, i) => ({
-        id: `participant-${i}`,
-        name: `User ${i + 1}`,
-        isActive: Math.random() > 0.2,
-        hasVideo: Math.random() > 0.4,
-        hasAudio: Math.random() > 0.3,
-        isSpeaking: i === 0 && Math.random() > 0.7
-      }));
-      
-      setMockParticipants(randomParticipants);
-    }
-  }, [participants, userName, userId]);
 
   const toggleVideo = () => {
     setShowVideo(!showVideo);
@@ -359,7 +388,7 @@ export const AuctionRoom: React.FC<AuctionRoomProps> = ({
             {/* Participants sidebar */}
             <div className={`${showVideo && isExpanded ? 'border-l border-gray-200' : ''} p-4 bg-gray-50`}>
               <ParticipantsList 
-                participants={mockParticipants} 
+                participants={auctionParticipants} 
                 maxDisplayed={isExpanded ? 15 : 5}
                 currentUserId={userId}
               />

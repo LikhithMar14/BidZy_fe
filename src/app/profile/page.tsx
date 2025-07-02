@@ -229,7 +229,7 @@ const AuctionCard = ({ auction, type }: AuctionCardProps) => (
         <div className="absolute top-3 right-3">
                       <div className="p-2 bg-black/50 rounded-lg backdrop-blur-sm">
               <span className="text-white text-sm font-medium">
-                ${((auction as any).CurrentPrice || (auction as any).currentPrice || 0).toLocaleString()}
+                {((auction as any).CurrentPrice || (auction as any).currentPrice || 0).toLocaleString('en-IN')}
               </span>
             </div>
           </div>
@@ -276,7 +276,7 @@ const AuctionCard = ({ auction, type }: AuctionCardProps) => (
             <div className="text-right">
               <p className="text-xs text-gray-500">Current Bid</p>
               <p className="font-bold text-lg bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-                ${((auction as any).CurrentPrice || (auction as any).currentPrice || 0).toLocaleString()}
+                {((auction as any).CurrentPrice || (auction as any).currentPrice || 0).toLocaleString('en-IN')}
               </p>
             </div>
           </div>
@@ -324,7 +324,7 @@ const BidCard = ({ bid }: BidCardProps) => (
               <Gavel className="h-5 w-5 text-pink-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">${bid.amount.toLocaleString()}</p>
+              <p className="font-semibold text-gray-900">₹{bid.amount.toLocaleString('en-IN')}</p>
               <p className="text-sm text-gray-600">Bid ID: {bid.bid_id.slice(0, 8)}...</p>
             </div>
           </div>
@@ -632,7 +632,7 @@ export default function ProfilePage() {
             <StatCard
               icon={DollarSign}
               title="Total Bid Amount"
-              value={`$${(stats?.total_amount_bid || 0).toLocaleString()}`}
+              value={`₹${(stats?.total_amount_bid || 0).toLocaleString('en-IN')}`}
               gradient="from-amber-500 to-orange-500"
               trend="up"    
             />
@@ -657,14 +657,14 @@ export default function ProfilePage() {
             <StatCard
               icon={TrendingUp}
               title="Average Bid"
-              value={`$${(stats?.avg_bid_amount || 0).toLocaleString()}`}
+              value={`₹${(stats?.avg_bid_amount || 0).toLocaleString('en-IN')}`}
               subtitle="Per auction"
               gradient="from-indigo-500 to-purple-500"
             />
             <StatCard
               icon={Star}
               title="Highest Bid"
-              value={`$${(stats?.highest_bid_placed || 0).toLocaleString()}`}
+              value={`₹${(stats?.highest_bid_placed || 0).toLocaleString('en-IN')}`}
               subtitle="Personal record"
               gradient="from-amber-400 to-yellow-400"
             />

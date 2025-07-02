@@ -1,5 +1,3 @@
-
-
 export type MessageType = 
   | 'auction' 
   | 'bid' 
@@ -114,22 +112,18 @@ function getUsernameFromCookies(): string | null {
   return getCookieValue('username');
 }
 
-
-
 export interface AuctionEvents {
   connected: (auctionId: string) => void;
   disconnected: (auctionId: string) => void;
   auctionData: (data: AuctionData) => void;
   bidUpdate: (bid: Bid) => void;
-  userJoined: (userId: string) => void;
+  userJoined: (userId: string, userName: string) => void;
   userLeft: (userId: string) => void;
   error: (message: string) => void;
   success: (message: string) => void;
   countUpdate: (count: number) => void;
   auctionEnded: () => void;
 }
-
-
 
 class WebSocketClient {
   private static instance: WebSocketClient;
@@ -154,7 +148,6 @@ class WebSocketClient {
     }
     return WebSocketClient.instance;
   }
-
 
   public async connect(connection: AuctionConnection): Promise<boolean> {
     if (this.isConnecting) {
@@ -262,8 +255,6 @@ class WebSocketClient {
     return this.isConnected && this.currentConnection?.auctionId === auctionId;
   }
 
-
-
   public joinAuction(): void {
     if (!this.isConnected || !this.currentConnection) {
       this.emit('error', 'Not connected to auction');
@@ -359,8 +350,6 @@ class WebSocketClient {
     this.sendMessage(message);
   }
 
-
-
   private handleMessage(data: string): void {
     try {
       const message: WebSocketMessage = JSON.parse(data);
@@ -422,7 +411,7 @@ class WebSocketClient {
   }
 
   private handleUserJoined(message: WebSocketMessage): void {
-    this.emit('userJoined', message.senderId || '');
+    this.emit('userJoined', message.senderId || '', message.userName || '');
   }
 
   private handleUserLeft(message: WebSocketMessage): void {
@@ -452,8 +441,6 @@ class WebSocketClient {
       this.pongTimeout = null;
     }
   }
-
-
 
   private sendMessage(message: WebSocketMessage): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
@@ -564,7 +551,6 @@ class WebSocketClient {
     }, delay);
   }
 
-
   private initializeEventListeners(): void {
     const eventTypes: (keyof AuctionEvents)[] = [
       'connected', 'disconnected', 'auctionData', 'bidUpdate', 
@@ -603,8 +589,6 @@ class WebSocketClient {
     }
   }
 
-
-
   public getConnectionStatus(): { isConnected: boolean; auctionId?: string } {
     return {
       isConnected: this.isConnected,
@@ -617,11 +601,7 @@ class WebSocketClient {
   }
 }
 
-
-
 export const auctionWebSocket = WebSocketClient.getInstance();
-
-
 
 export const connectToAuction = (connection: AuctionConnection): Promise<boolean> => {
   return auctionWebSocket.connect(connection);
@@ -659,7 +639,6 @@ export const getConnectionStatus = () => {
   return auctionWebSocket.getConnectionStatus();
 };
 
-
 export const useAuctionWebSocket = () => {
   return {
     connect: connectToAuction,
@@ -675,102 +654,3 @@ export const useAuctionWebSocket = () => {
     off: auctionWebSocket.off.bind(auctionWebSocket)
   };
 };
-
-
-
-/*
-// Example 1: Basic usage
-const connection: AuctionConnection = {
-  auctionId: 'auction-123',
-  token: 'jwt-token-here',
-  userId: 'user-456',
-  userName: 'John Doe'
-};
-
-// Connect to auction
-connectToAuction(connection).then(success => {
-  if (success) {
-    console.log('Connected to auction');
-    joinAuction();
-  }
-});
-
-// Listen for events
-auctionWebSocket.on('bidUpdate', (bid: Bid) => {
-  console.log('New bid:', bid);
-});
-
-auctionWebSocket.on('auctionData', (data: AuctionData) => {
-  console.log('Auction data:', data);
-});
-
-// Place a bid
-placeBid(100.50);
-
-// Example 2: React component usage
-import React, { useEffect, useState } from 'react';
-import { useAuctionWebSocket, AuctionData, Bid } from './websocket-client';
-
-const AuctionComponent: React.FC<{ auctionId: string; token: string; userId: string; userName: string }> = ({ 
-  auctionId, token, userId, userName 
-}) => {
-  const [auctionData, setAuctionData] = useState<AuctionData | null>(null);
-  const [bids, setBids] = useState<Bid[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
-  
-  const ws = useAuctionWebSocket();
-
-  useEffect(() => {
-    // Connect to auction
-    ws.connect({ auctionId, token, userId, userName }).then(success => {
-      if (success) {
-        setIsConnected(true);
-        ws.join();
-        ws.getAuctionData();
-      }
-    });
-
-    // Set up event listeners
-    ws.on('auctionData', setAuctionData);
-    ws.on('bidUpdate', (bid: Bid) => {
-      setBids(prev => [...prev, bid]);
-    });
-    ws.on('connected', () => setIsConnected(true));
-    ws.on('disconnected', () => setIsConnected(false));
-
-    return () => {
-      ws.leave();
-      ws.disconnect();
-    };
-  }, [auctionId, token, userId, userName]);
-
-  const handleBid = (amount: number) => {
-    const result = ws.placeBid(amount);
-    if (!result.success) {
-      alert(result.message);
-    }
-  };
-
-  return (
-    <div>
-      <h2>Auction: {auctionData?.title}</h2>
-      <p>Current Price: ${auctionData?.currentPrice}</p>
-      <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
-      
-      <div>
-        <input type="number" placeholder="Bid amount" />
-        <button onClick={() => handleBid(100)}>Place Bid</button>
-      </div>
-      
-      <div>
-        <h3>Recent Bids:</h3>
-        {bids.map((bid, index) => (
-          <div key={index}>
-            {bid.userName}: ${bid.price}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-*/

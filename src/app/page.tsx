@@ -88,7 +88,7 @@ export default function HomePage() {
   const stats = [
     { number: "10K+", label: "Active Users", icon: Users },
     { number: "50K+", label: "Auctions Completed", icon: Gavel },
-    { number: "$2M+", label: "Total Value", icon: DollarSign },
+    { number: "₹16.60 Cr+", label: "Total Value", icon: DollarSign },
     { number: "99.9%", label: "Satisfaction Rate", icon: Star },
   ];
 
@@ -136,7 +136,7 @@ export default function HomePage() {
     },
     {
       name: "Pro",
-      price: "$9.99",
+      price: "₹999",
       period: "/month",
       description: "For serious bidders",
       features: [
@@ -151,7 +151,7 @@ export default function HomePage() {
     },
     {
       name: "Enterprise",
-      price: "$29.99",
+      price: "₹2999",
       period: "/month",
       description: "For businesses and dealers",
       features: [
@@ -204,21 +204,21 @@ export default function HomePage() {
   const recentAuctions = [
     {
       title: "Vintage Rolex Submariner",
-      currentBid: "$2,450",
+      currentBid: "₹2,450",
       timeLeft: "02:45:30",
       bidders: 12,
       image: "⌚",
     },
     {
       title: "Original Picasso Sketch",
-      currentBid: "$15,200",
+      currentBid: "₹15,200",
       timeLeft: "01:23:15",
       bidders: 8,
       image: "🎨",
     },
     {
       title: "Antique Persian Rug",
-      currentBid: "$3,800",
+      currentBid: "₹3,800",
       timeLeft: "04:12:45",
       bidders: 15,
       image: "🟫",
@@ -346,7 +346,7 @@ export default function HomePage() {
                         Current Bid
                       </p>
                       <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
-                        $2,450
+                        ₹2,450
                       </p>
                     </div>
                   </div>

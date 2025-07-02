@@ -177,7 +177,7 @@ const StatCard = ({ icon: Icon, title, value, subtitle, gradient }: StatCardProp
           </div>
         </div>
         <div className="space-y-1">
-          <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
+          <h3 className="text-2xl font-bold text-gray-900">{title.includes('Spent') || title.includes('Price') ? `₹${value.toLocaleString('en-IN')}` : value}</h3>
           <p className="text-gray-700 font-medium">{title}</p>
           {subtitle && <p className="text-gray-500 text-sm">{subtitle}</p>}
         </div>
@@ -233,35 +233,52 @@ const AuctionCard = ({ auction, isUpcoming = false }: AuctionCardProps) => {
     return "CANCELLED";
   };
 
+  // Function to resolve user ID to username from participants
+  const resolveUserIdToUsername = (userId: string): string => {
+    if (userId && !userId.includes('-') && userId.length < 20) {
+      return userId; // Already a username
+    }
+    if (auction.participants && Array.isArray(auction.participants)) {
+      const participant = auction.participants.find((p: any) =>
+        p.id === userId || p.user_id === userId
+      );
+      if (participant) {
+        return participant.user_name || 'Unknown User';
+      }
+    }
+    return userId || 'Unknown User';
+  };
+
   // Enhanced winner display with proper fallback
   const getWinnerDisplay = () => {
     if (auction.Status !== Status.ENDED) return null;
-    
-    // Check multiple possible winner name fields
     const winnerName = auction.WinnerName || 
-                      (auction as any).winnerName || 
-                      (auction as any).winner_name ||
-                      (auction as any).winner?.name ||
-                      (auction as any).winner?.user_name;
-    
+      (auction as any).winnerName || 
+      (auction as any).winner_name ||
+      (auction as any).winner?.name ||
+      (auction as any).winner?.user_name ||
+      (auction as any).winner?.userName ||
+      (auction as any).highestBidder ||
+      auction.highestBidder ||
+      '';
     if (winnerName && winnerName.trim()) {
+      const resolvedWinnerName = resolveUserIdToUsername(winnerName);
       return (
         <div className="mt-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-600" />
             <div className="flex-1">
               <p className="text-sm font-semibold text-amber-800">
-                🏆 Winner: {winnerName}
+                🏆 Winner: {resolvedWinnerName}
               </p>
               <p className="text-xs text-amber-600">
-                Final bid: ${auction.CurrentPrice?.toLocaleString() || 'N/A'}
+                Final bid: ₹{Number(auction.CurrentPrice || auction.StartingPrice || 0).toLocaleString('en-IN')}
               </p>
             </div>
           </div>
         </div>
       );
     }
-    
     return (
       <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
         <div className="flex items-center gap-2">
@@ -326,7 +343,7 @@ const AuctionCard = ({ auction, isUpcoming = false }: AuctionCardProps) => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-sm text-gray-500">Current Price</p>
-              <p className="text-2xl font-bold text-gray-900">${auction.CurrentPrice?.toLocaleString() || auction.StartingPrice?.toLocaleString() || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">₹{Number(auction.CurrentPrice || auction.StartingPrice || 0).toLocaleString('en-IN')}</p>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-500">{getTimeDisplay()}</p>
@@ -461,7 +478,7 @@ export default function DashboardPage() {
       );
       
       if (isUserAuction && bid.userName !== user.user_name) {
-        toast.info(`💰 New bid: $${bid.price}`, {
+        toast.info(`💰 New bid: ₹${bid.price.toLocaleString('en-IN')}`, {
           description: `${bid.userName} placed a bid on your auction`,
         });
       }
@@ -552,131 +569,36 @@ export default function DashboardPage() {
 
   const { activeAuctions, upcomingAuctions, pastAuctions } = useMemo(() => {
     const now = new Date();
-    
-    // For user-related auctions (created by user or participated in)
-    const userAuctions = userRelatedAuctions || [];
-    
-    console.log('🔍 Dashboard Debug - Raw user auctions:', userAuctions.length);
-    console.log('🔍 Dashboard Debug - User auctions:', userAuctions.map((a: AuctionResponse) => ({
-      id: a.ID,
-      title: a.Title,
-      status: a.Status,
-      startDate: a.StartDate,
-      endDate: a.EndDate,
-      isActive: a.isActive
-    })));
-    
-    const active = userAuctions.filter(auction => {
-      // Improved date parsing to handle timezone formats
+    // Use global auctions for categorization
+    const globalAuctions = allAvailableAuctions || [];
+
+    const active = globalAuctions.filter(auction => {
       const startTime = new Date(auction.StartDate);
       const endTime = new Date(auction.EndDate);
-      
-      // Check if dates are valid
-      if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
-        console.warn('🔍 Invalid date format for auction:', auction.ID, {
-          startDate: auction.StartDate,
-          endDate: auction.EndDate
-        });
-        return false;
-      }
-      
+      if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) return false;
       const isActiveByTime = now >= startTime && now < endTime;
       const isActiveByStatus = auction.Status === Status.ACTIVE;
-      const isActive = isActiveByTime && isActiveByStatus;
-      
-      if (auction.Title?.includes('TEST-101')) {
-        console.log('🔍 TEST-101 auction active check:', {
-          id: auction.ID,
-          now: now.toISOString(),
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
-          isActiveByTime,
-          isActiveByStatus,
-          status: auction.Status,
-          isActive,
-          rawStartDate: auction.StartDate,
-          rawEndDate: auction.EndDate
-        });
-      }
-      
-      return isActive;
-    });
-    
-    const upcoming = userAuctions.filter(auction => {
-      // Improved date parsing to handle timezone formats
-      const startTime = new Date(auction.StartDate);
-      
-      // Check if date is valid
-      if (isNaN(startTime.getTime())) {
-        console.warn('🔍 Invalid start date format for auction:', auction.ID, {
-          startDate: auction.StartDate
-        });
-        return false;
-      }
-      
-      const isUpcomingByTime = startTime > now;
-      const isUpcomingByStatus = auction.Status === Status.INACTIVE;
-      const isUpcoming = isUpcomingByTime || isUpcomingByStatus;
-      
-      if (auction.Title?.includes('TEST-101')) {
-        console.log('🔍 TEST-101 auction upcoming check:', {
-          id: auction.ID,
-          now: now.toISOString(),
-          startTime: startTime.toISOString(),
-          isUpcomingByTime,
-          isUpcomingByStatus,
-          status: auction.Status,
-          isUpcoming,
-          rawStartDate: auction.StartDate
-        });
-      }
-      
-      return isUpcoming;
-    });
-    
-    const past = userAuctions.filter(auction => {
-      // Improved date parsing to handle timezone formats
-      const endTime = new Date(auction.EndDate);
-      
-      // Check if date is valid
-      if (isNaN(endTime.getTime())) {
-        console.warn('🔍 Invalid end date format for auction:', auction.ID, {
-          endDate: auction.EndDate
-        });
-        return false;
-      }
-      
-      const isPastByTime = endTime <= now;
-      const isPastByStatus = auction.Status === Status.ENDED;
-      const isPast = isPastByTime || isPastByStatus;
-      
-      if (auction.Title?.includes('TEST-101')) {
-        console.log('🔍 TEST-101 auction past check:', {
-          id: auction.ID,
-          now: now.toISOString(),
-          endTime: endTime.toISOString(),
-          isPastByTime,
-          isPastByStatus,
-          status: auction.Status,
-          isPast,
-          rawEndDate: auction.EndDate
-        });
-      }
-      
-      return isPast;
+      return isActiveByTime && isActiveByStatus;
     });
 
-    console.log('🔍 Dashboard Debug - Categorized auctions:', {
-      active: active.length,
-      upcoming: upcoming.length,
-      past: past.length,
-      activeIds: active.map((a: AuctionResponse) => a.ID),
-      upcomingIds: upcoming.map((a: AuctionResponse) => a.ID),
-      pastIds: past.map((a: AuctionResponse) => a.ID)
+    const upcoming = globalAuctions.filter(auction => {
+      const startTime = new Date(auction.StartDate);
+      if (isNaN(startTime.getTime())) return false;
+      const isUpcomingByTime = startTime > now;
+      const isUpcomingByStatus = auction.Status === Status.INACTIVE;
+      return isUpcomingByTime || isUpcomingByStatus;
+    });
+
+    const past = globalAuctions.filter(auction => {
+      const endTime = new Date(auction.EndDate);
+      if (isNaN(endTime.getTime())) return false;
+      const isPastByTime = endTime <= now;
+      const isPastByStatus = auction.Status === Status.ENDED;
+      return isPastByTime || isPastByStatus;
     });
 
     return { activeAuctions: active, upcomingAuctions: upcoming, pastAuctions: past };
-  }, [userRelatedAuctions]);
+  }, [allAvailableAuctions]);
 
   const isLoading = isUserInfoLoading || isUserStatsLoading || isUserAuctionsLoading || isParticipatedAuctionsLoading || isAllAuctionsLoading;
 
@@ -719,7 +641,7 @@ export default function DashboardPage() {
     {
       icon: DollarSign,
       title: "Total Spent",
-      value: `$${userStats?.data?.total_amount_bid?.toLocaleString() || '0'}`,
+      value: `${userStats?.data?.total_amount_bid?.toLocaleString() || '0'}`,
       subtitle: "In auctions",
       gradient: "from-emerald-500 to-teal-600"
     }

@@ -88,8 +88,8 @@ export const useAuctionWebSocket = (): UseAuctionWebSocketReturn => {
     cleanupFunctions.push(() => auctionWebSocket.off('bidUpdate', onBidUpdate));
 
     // User joined event
-    const onUserJoined = (userId: string) => {
-      console.log('User joined:', userId);
+    const onUserJoined = (userId: string, userName: string) => {
+      console.log('User joined:', userId, userName);
     };
     auctionWebSocket.on('userJoined', onUserJoined);
     cleanupFunctions.push(() => auctionWebSocket.off('userJoined', onUserJoined));

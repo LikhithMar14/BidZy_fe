@@ -58,7 +58,7 @@ const CustomTooltip = ({ active, payload }: any) => {
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-4">
             <span className="text-gray-600">Amount:</span>
-            <span className="font-bold text-green-600">${data.amount.toFixed(2)}</span>
+            <span className="font-bold text-green-600">₹{data.amount.toLocaleString('en-IN')}</span>
           </div>
           <div className="flex items-center justify-between gap-4">
             <span className="text-gray-600">Bidder:</span>
@@ -275,7 +275,7 @@ export const LiveBiddingChart: React.FC<LiveBiddingChartProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
                 <div className="text-2xl font-bold text-green-600">
-                  ${bidStats.highestBid.toFixed(2)}
+                  ₹{bidStats.highestBid.toLocaleString('en-IN')}
                 </div>
                 <div className="text-xs text-green-700 font-medium">Highest Bid</div>
               </div>
@@ -287,13 +287,13 @@ export const LiveBiddingChart: React.FC<LiveBiddingChartProps> = ({
               </div>
               <div className="text-center p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
                 <div className="text-2xl font-bold text-purple-600">
-                  ${bidStats.averageBidIncrease.toFixed(0)}
+                  ₹{bidStats.averageBidIncrease.toLocaleString('en-IN')}
                 </div>
                 <div className="text-xs text-purple-700 font-medium">Avg Increase</div>
               </div>
               <div className="text-center p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl">
                 <div className="text-2xl font-bold text-orange-600">
-                  {bidStats.bidVelocity.toFixed(1)}
+                  {bidStats.bidVelocity.toLocaleString('en-IN')}
                 </div>
                 <div className="text-xs text-orange-700 font-medium">Bids/Min</div>
               </div>
@@ -324,7 +324,7 @@ export const LiveBiddingChart: React.FC<LiveBiddingChartProps> = ({
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value) => `$${value}`}
+                    tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   
@@ -367,10 +367,10 @@ export const LiveBiddingChart: React.FC<LiveBiddingChartProps> = ({
                   <span className="font-semibold text-amber-900">Current Leader</span>
                 </div>
                 <div className="text-lg font-bold text-amber-800">
-                  {bidStats.topBidder} {bidStats.topBidder === currentUserName && '(You!)'}
+                  ₹{bidStats.highestBid.toLocaleString('en-IN')}
                 </div>
                 <div className="text-sm text-amber-700">
-                  Leading with ${bidStats.highestBid.toFixed(2)}
+                  Leading with ₹{bidStats.highestBid.toLocaleString('en-IN')}
                 </div>
               </motion.div>
             )}

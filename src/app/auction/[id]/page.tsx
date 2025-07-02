@@ -29,7 +29,10 @@ import {
   Wifi,
   WifiOff,
   Activity,
-  Zap as LiveIcon
+  Zap as LiveIcon,
+  LayoutGrid,
+  BarChart3,
+  Video
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -293,6 +296,7 @@ export default function AuctionPage() {
   const queryClient = useQueryClient();
   const [bidAmount, setBidAmount] = useState("");
   const [showBidHistory, setShowBidHistory] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'live' | 'analytics'>('overview');
   
   // WebSocket Integration States
   const [isConnected, setIsConnected] = useState(false);
@@ -317,33 +321,8 @@ export default function AuctionPage() {
     queryKey: ['auction', auctionId],
     queryFn: async () => {
       const response = await getAuctionById(auctionId);
-      if (response) {
-        
-        const apiResponse = response as any;
-        return {
-          ...response,
-          CurrentPrice: apiResponse.currentPrice || response.CurrentPrice,
-          StartDate: apiResponse.startTime || response.StartDate,
-          EndDate: apiResponse.endTime || response.EndDate,
-          ClientCount: apiResponse.clientCount || response.ClientCount,
-          Status: apiResponse.status || response.Status,
-          Increment: apiResponse.increment || response.Increment,
-          StartingPrice: apiResponse.startingPrice || response.StartingPrice,
-          Image: apiResponse.image || response.Image,
-          Title: apiResponse.title || response.Title,
-          Description: apiResponse.description || response.Description,
-          categoryIds: apiResponse.categoryIds || response.categoryIds,
-          user: apiResponse.user || response.user,
-          participants: apiResponse.participants || response.participants || [],
-          isActive: apiResponse.isActive || response.isActive,
-          highestBidder: apiResponse.highestBidder || response.highestBidder || '',
-          WinnerName: apiResponse.WinnerName || response.WinnerName || '',
-          ID: apiResponse.auctionId || response.ID
-        };
-      }
       return response;
     },
-    refetchInterval: 2000, // Reduced to 2 seconds for better real-time updates 
   });
 
 
@@ -451,9 +430,11 @@ export default function AuctionPage() {
       const prevCount = participantCount;
       setParticipantCount(data.clientCount);
       console.log('📊 Auction data received with participant count:', data.clientCount);
+      console.log('📊 Auction participants:', data.participants);
       
-      // Update participant count instantly for no latency
-      if (data.clientCount !== prevCount && prevCount > 0) {
+      // Only show toast for significant changes in participant count (more than 1 person difference)
+      // This prevents flooding with notifications for every small change
+      if (Math.abs(data.clientCount - prevCount) > 1 && prevCount > 0) {
         toast.info(`👥 ${data.clientCount} people watching`, {
           duration: 2000,
         });
@@ -480,10 +461,9 @@ export default function AuctionPage() {
         return prev;
       });
 
-      // Show notification for other users' bids
+      // Show toast for new bids (only if not from current user)
       if (bid.userName !== user?.user_name) {
-        toast.info(`💰 New bid: $${bid.price}`, {
-          description: `${bid.userName} placed a bid`,
+        toast.success(`🔥 New bid: ₹${bid.price.toLocaleString('en-IN')} by ${bid.userName || 'Anonymous'}!`, {
           duration: 3000,
         });
       }
@@ -497,24 +477,29 @@ export default function AuctionPage() {
       const prevCount = participantCount;
       setParticipantCount(count);
       
-      // Show toast for participant changes with no latency
-      if (count > prevCount) {
-        toast.success(`👋 Someone joined (${count} watching)`, { duration: 2000 });
-      } else if (count < prevCount && prevCount > 0) {
-        toast.info(`👋 Someone left (${count} watching)`, { duration: 2000 });
+      // Only show toast for significant changes (more than 1 person difference)
+      // This prevents flooding with notifications
+      if (Math.abs(count - prevCount) > 1 && prevCount > 0) {
+        if (count > prevCount) {
+          toast.success(`👋 Multiple users joined (${count} watching)`, { duration: 2000 });
+        } else if (count < prevCount) {
+          toast.info(`👋 Multiple users left (${count} watching)`, { duration: 2000 });
+        }
       }
     };
 
-    const handleUserJoined = (userId: string) => {
-      console.log(`👋 User joined: ${userId}`);
-      // Request updated participant count immediately
-      wsGetAuctionData();
+    const handleUserJoined = (userId: string, userName: string) => {
+      console.log(`👋 User joined: ${userId} (${userName})`);
+      // Don't call wsGetAuctionData() on every join event to prevent flooding
+      // Instead, update the participant count directly
+      setParticipantCount(prev => prev + 1);
     };
 
     const handleUserLeft = (userId: string) => {
       console.log(`👋 User left: ${userId}`);
-      // Request updated participant count immediately
-      wsGetAuctionData();
+      // Don't call wsGetAuctionData() on every leave event to prevent flooding
+      // Instead, update the participant count directly
+      setParticipantCount(prev => Math.max(0, prev - 1));
     };
 
     // Status events
@@ -614,15 +599,15 @@ export default function AuctionPage() {
     if (new Date() > new Date(auction.EndDate)) return 'Auction has ended';
     
     if (amount <= currentPrice) {
-      return `Bid must be higher than current price ($${currentPrice})`;
+      return `Bid must be higher than current price (₹${currentPrice.toLocaleString('en-IN')})`;
     }
     
     const minBid = currentPrice + increment;
     if (amount < minBid) {
-      return `Minimum bid is $${minBid.toFixed(2)}`;
+      return `Minimum bid is ₹${minBid.toLocaleString('en-IN')}`;
     }
     
-    if (amount > 1000000) return 'Bid amount too large';
+    if (amount > 1000000000) return 'Bid amount too large';
     
     return null; // Valid bid
   };
@@ -740,6 +725,18 @@ export default function AuctionPage() {
   const isAuctionActive = now >= startTime && now < endTime && auction.Status === Status.ACTIVE;
   const isAuctionEnded = now >= endTime || auction.Status === Status.ENDED;
   
+  // Debug auction winner data
+  console.log("Auction winner data:", {
+    WinnerName: auction?.WinnerName,
+    winnerName: (auction as any)?.winnerName,
+    winner_name: (auction as any)?.winner_name,
+    winner: (auction as any)?.winner,
+    highestBidder: auction?.highestBidder,
+    status: auction?.Status,
+    isEnded: isAuctionEnded,
+    participants: auction?.participants
+  });
+  
   // Use WebSocket data when available for more accurate info
   const currentPrice = (() => {
     // If we have real-time bids, use the latest bid price
@@ -753,6 +750,27 @@ export default function AuctionPage() {
   const currentIncrement = wsAuctionData?.increment || auction.Increment;
   const currentParticipants = participantCount || auction.ClientCount;
   
+  // Function to resolve user ID to username from participants
+  const resolveUserIdToUsername = (userId: string): string => {
+    // Check if it's already a username (not a UUID)
+    if (userId && !userId.includes('-') && userId.length < 20) {
+      return userId; // Already a username
+    }
+    
+    // Try to find the user in participants array
+    if (auction.participants && Array.isArray(auction.participants)) {
+      const participant = auction.participants.find((p: any) => 
+        p.id === userId || p.user_id === userId
+      );
+      if (participant) {
+        return participant.user_name || 'Unknown User';
+      }
+    }
+    
+    // If we can't resolve it, return the original value
+    return userId || 'Unknown User';
+  };
+
   // Get the highest bidder name - prioritize real-time bid data over API data
   const currentHighestBidder = (() => {
     // If we have real-time bids, use the latest bidder's name
@@ -761,7 +779,8 @@ export default function AuctionPage() {
       return latestBid.userName || 'Anonymous';
     }
     // Fallback to WebSocket auction data or API data
-    return wsAuctionData?.highestBidder || auction.highestBidder || '';
+    const highestBidderId = wsAuctionData?.highestBidder || auction.highestBidder || '';
+    return resolveUserIdToUsername(highestBidderId);
   })();
   
   const quickBidAmounts = [currentIncrement, currentIncrement * 2, currentIncrement * 5];
@@ -802,6 +821,30 @@ export default function AuctionPage() {
       return timeB - timeA;
     });
 
+  const TabButton = ({ active, onClick, icon: Icon, label }: { active: boolean, onClick: () => void, icon: React.ElementType, label: string }) => (
+    <motion.button
+      onClick={onClick}
+      className={`relative flex items-center justify-center gap-2 px-4 sm:px-6 py-4 font-semibold text-base transition-all duration-300 w-full ${
+        active
+          ? 'text-rose-600'
+          : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50/50'
+      }`}
+      whileHover={{ scale: active ? 1 : 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <Icon className="w-5 h-5" />
+      <span>{label}</span>
+      {active && (
+        <motion.div
+          layoutId="activeAuctionTab"
+          className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-purple-600 rounded-t-full"
+          initial={false}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      )}
+    </motion.button>
+  );
+
   return (
           <div className="min-h-screen bg-gradient-to-br from-rose-500 via-pink-600 to-purple-700 relative overflow-hidden">
       {/* Background effects */}
@@ -836,505 +879,612 @@ export default function AuctionPage() {
           </Link>
         </motion.div>
 
-        {/* Top Section - Auction Info & Timer */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
-          {/* Auction Image and Info */}
+        {/* Tab Navigation */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="lg:col-span-2"
-          >
-            <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden h-full">
-              <div className="relative bg-gray-100">
-                <div className="relative w-full flex justify-center items-center" style={{ minHeight: "300px", maxHeight: "400px" }}>
-                  <img
-                    src={auction.Image || "/auction-placeholder.svg"}
-                    alt={auction.Title}
-                    className="max-h-[400px] max-w-full object-contain"
-                    style={{ width: "auto", height: "auto" }}
-                  />
-                  
-                  <div className="absolute top-4 left-4 flex gap-2 z-10">
-                    {(auction.categoryIds || []).map((categoryId: number) => {
-                      const category = categories[categoryId as Category];
-                      return (
-                        <div
-                          key={categoryId}
-                          className={`px-3 py-1 bg-gradient-to-r ${category.color} text-white rounded-full text-sm font-medium flex items-center gap-1 shadow-md`}
-                        >
-                          <span>{category.icon}</span>
-                          {category.name}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  
-                  <div className="absolute top-4 right-4 z-10">
-                    {isAuctionActive && (
-                      <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full text-sm font-bold flex items-center gap-1 shadow-md"
-                      >
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        LIVE
-                      </motion.div>
-                    )}
-                    {isAuctionNotStarted && (
-                      <div className="px-3 py-1 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-full text-sm font-bold flex items-center gap-1 shadow-md">
-                        <Clock className="w-3 h-3" />
-                        STARTS SOON
-                      </div>
-                    )}
-                    {isAuctionEnded && (
-                      <div className="px-3 py-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full text-sm font-bold shadow-md">
-                        ENDED
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{auction.Title}</h1>
-                    <div className="flex flex-wrap items-center gap-4 text-gray-600 text-sm">
-                      <div className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
-                        <span>By {auction.user.user_name}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        <span>{currentParticipants} watching</span>
-                      </div>
-                      
-                      {/* WebSocket Connection Status */}
-                      <div className="flex items-center gap-1">
-                        {connectionStatus === 'connected' && (
-                          <>
-                            <Wifi className="w-4 h-4 text-green-600" />
-                            <span className="text-green-600 font-medium text-sm">LIVE</span>
-                          </>
-                        )}
-                        {connectionStatus === 'connecting' && (
-                          <>
-                            <Activity className="w-4 h-4 text-blue-600 animate-pulse" />
-                            <span className="text-blue-600 text-sm">Connecting...</span>
-                          </>
-                        )}
-                        {connectionStatus === 'error' && (
-                          <>
-                            <WifiOff className="w-4 h-4 text-orange-600" />
-                            <span className="text-orange-600 text-sm">Limited</span>
-                          </>
-                        )}
-                        {connectionStatus === 'disconnected' && user && (
-                          <>
-                            <WifiOff className="w-4 h-4 text-gray-600" />
-                            <span className="text-gray-600 text-sm">Offline</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="icon" className="rounded-full">
-                      <Heart className="w-4 h-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="rounded-full">
-                      <Share2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="prose max-w-none">
-                  <p className="text-gray-700 leading-relaxed line-clamp-3">{auction.Description}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Timer & Current Price */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="space-y-4"
-          >
-            {/* Timer Card */}
-            <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
-              <CountdownTimer startTime={auction.StartDate} endTime={auction.EndDate} isActive={isAuctionActive} />
-            </Card>
-
-            {/* Current Price Card */}
-            <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
-              <CardContent className="p-6">
-                <div className="text-center mb-4">
-                  <div className="text-sm text-gray-600 mb-2">Current Highest Bid</div>
-                  <motion.div
-                    key={currentPrice}
-                    initial={{ scale: 1.1, color: '#10b981' }}
-                    animate={{ scale: 1, color: '#111827' }}
-                    transition={{ duration: 0.5 }}
-                    className="text-3xl font-bold text-gray-900 mb-2"
-                  >
-                    ${currentPrice}
-                  </motion.div>
-                  {currentHighestBidder && (
-                    <div className="flex items-center justify-center gap-2 text-gray-600">
-                      <Crown className="w-4 h-4 text-amber-600" />
-                      <span className="text-sm">Leading: {currentHighestBidder}</span>
-                      {connectionStatus === 'connected' && (
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse ml-1"></div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {isAuctionActive && user && (
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      {quickBidAmounts.map((amount) => (
-                        <Button
-                          key={amount}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleQuickBid(amount)}
-                          className="flex-1 text-xs"
-                        >
-                          +${amount}
-                        </Button>
-                      ))}
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        placeholder="Enter bid"
-                        value={bidAmount}
-                        onChange={(e) => setBidAmount(e.target.value)}
-                        className="text-base"
-                        step="0.01"
-                        min={auction.CurrentPrice + auction.Increment}
-                      />
-                      <Button
-                        onClick={handlePlaceBid}
-                        disabled={!bidAmount || connectionStatus !== 'connected'}
-                        className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 px-4"
-                      >
-                        <Gavel className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    
-                    <p className="text-xs text-gray-600 text-center">
-                      Min: ${(currentPrice + currentIncrement).toFixed(2)}
-                      {connectionStatus === 'connected' && (
-                        <span className="text-green-600 ml-2 font-medium">• Live</span>
-                      )}
-                    </p>
-                  </div>
-                )}
-
-                                 {!user && isAuctionActive && (
-                   <Button asChild className="w-full bg-gradient-to-r from-rose-500 to-purple-600">
-                     <Link href="/auth/login">Login to Bid</Link>
-                   </Button>
-                 )}
-
-                 {isAuctionNotStarted && (
-                   <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl">
-                     <Clock className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                     <h3 className="text-base font-bold text-gray-900 mb-1">Auction Not Started</h3>
-                     <p className="text-sm text-gray-600">
-                       This auction will begin on {new Date(auction.StartDate).toLocaleDateString()}
-                     </p>
-                   </div>
-                 )}
-
-                 {/* Reconnection section */}
-                 {connectionStatus === 'error' && user && (
-                   <div className="mt-4 p-3 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl">
-                     <div className="text-center">
-                       <WifiOff className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-                       <p className="text-xs text-orange-700 mb-2">Limited connectivity</p>
-                       <Button
-                         variant="outline"
-                         size="sm"
-                         onClick={handleReconnect}
-                         className="bg-white hover:bg-orange-50 border-orange-300 text-orange-700"
-                       >
-                         <Wifi className="w-3 h-3 mr-1" />
-                         Reconnect
-                       </Button>
-                       
-                       {/* Development Test Button */}
-                       {process.env.NODE_ENV === 'development' && (
-                         <Button
-                           variant="outline"
-                           size="sm"
-                           onClick={() => {
-                             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
-                             const wsUrl = apiUrl.replace('http://', 'ws://').replace('https://', 'wss://');
-                             const testUrl = `${wsUrl}/join-auction?auctionId=${auction.ID}&token=test`;
-                             console.log('🧪 Testing WebSocket URL:', testUrl);
-                             toast.info('Check browser console for WebSocket test details');
-                             
-                             // Simple WebSocket test
-                             try {
-                               const testWs = new WebSocket(testUrl);
-                               testWs.onopen = () => {
-                                 console.log('✅ WebSocket test connection successful');
-                                 testWs.close();
-                                 toast.success('WebSocket server is reachable');
-                               };
-                               testWs.onerror = (error) => {
-                                 console.error('❌ WebSocket test failed:', error);
-                                 toast.error('WebSocket server is not reachable');
-                               };
-                               testWs.onclose = (event) => {
-                                 console.log('🔌 WebSocket test closed:', event.code, event.reason);
-                               };
-                             } catch (error) {
-                               console.error('💥 WebSocket test error:', error);
-                               toast.error('WebSocket test failed');
-                             }
-                           }}
-                           className="bg-white hover:bg-blue-50 border-blue-300 text-blue-700 ml-2"
-                         >
-                           🧪 Test WS
-                         </Button>
-                       )}
-                     </div>
-                   </div>
-                 )}
-
-                 {isAuctionEnded && (
-                   <div className="text-center p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
-                     <Trophy className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                     <h3 className="text-base font-bold text-gray-900 mb-1">Auction Ended</h3>
-                     {auction.WinnerName ? (
-                       <p className="text-sm text-gray-600">
-                         Won by <span className="font-semibold">{auction.WinnerName}</span>
-                       </p>
-                     ) : (
-                       <p className="text-sm text-gray-600">No winner</p>
-                     )}
-                   </div>
-                 )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-                 {/* Live Bidding Chart - Full Width Section */}
-         <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.6, delay: 0.2 }}
-           className="mb-6"
-         >
-           <LiveBiddingChart 
-             auctionId={auction.ID}
-             currentUserName={user?.user_name}
-             startingPrice={auction.StartingPrice}
-             isActive={isAuctionActive}
-           />
-         </motion.div>
-
-        {/* LiveKit Video Integration */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-6"
+          transition={{ delay: 0.1 }}
+          className="mb-4 sm:mb-6"
         >
-          <AuctionRoom 
-            auctionId={auction.ID}
-            userName={user?.user_name}
-            userId={user?.id}
-            isActive={isAuctionActive}
-            participants={currentParticipants}
-            token={user?.token}
-          />
+          <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-around">
+              <TabButton
+                active={activeTab === 'overview'}
+                onClick={() => setActiveTab('overview')}
+                icon={LayoutGrid}
+                label="Overview"
+              />
+              <TabButton
+                active={activeTab === 'live'}
+                onClick={() => setActiveTab('live')}
+                icon={Video}
+                label="Live Stream"
+              />
+              <TabButton
+                active={activeTab === 'analytics'}
+                onClick={() => setActiveTab('analytics')}
+                icon={BarChart3}
+                label="Analytics"
+              />
+            </div>
+          </Card>
         </motion.div>
 
-        {/* Bottom Section - Bids & Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Recent Bids - Takes 2 columns */}
-          <motion.div
+        {/* Tab Content */}
+        <div>
+          {/* Overview Tab */}
+          <div hidden={activeTab !== 'overview'}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="overview"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="lg:col-span-2"
-          >
-            <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                exit={{ opacity: 0, y: -20 }}
+              >
+                {/* 🎮 GAMIFIED TOP SECTION - Auction Arena & Battle Controls */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                  {/* 🏆 ARENA DISPLAY - Main Item Showcase */}
+                  <div className="lg:col-span-2">
+                    <motion.div
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.6 }}
+                      className="relative group"
+                    >
+                      <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-lg rounded-3xl overflow-hidden h-full">
+                        {/* 🎯 Arena Header */}
+                        <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-r from-black/20 to-transparent">
+                          <div className="flex items-center justify-between">
+                            <div className="flex gap-2">
+                              {(auction.categoryIds || []).map((categoryId: number) => {
+                                const category = categories[categoryId as Category];
+                                return (
+                                  <motion.div
+                                    key={categoryId}
+                                    whileHover={{ scale: 1.05 }}
+                                    className={`px-3 py-1 bg-gradient-to-r ${category.color} text-white rounded-full text-sm font-bold flex items-center gap-1 shadow-lg border border-white/20`}
+                                  >
+                                    <span className="text-lg">{category.icon}</span>
+                                    {category.name}
+                                  </motion.div>
+                                );
+                              })}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {isAuctionActive && (
+                                <motion.div
+                                  animate={{ 
+                                    scale: [1, 1.1, 1],
+                                    boxShadow: ["0 0 0 rgba(34, 197, 94, 0.4)", "0 0 20px rgba(34, 197, 94, 0.8)", "0 0 0 rgba(34, 197, 94, 0.4)"]
+                                  }}
+                                  transition={{ duration: 2, repeat: Infinity }}
+                                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-white/20"
+                                >
+                                  <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                                  <span className="text-lg">⚡ LIVE BATTLE</span>
+                                </motion.div>
+                              )}
+                              {isAuctionNotStarted && (
+                                <motion.div
+                                  animate={{ scale: [1, 1.05, 1] }}
+                                  transition={{ duration: 2, repeat: Infinity }}
+                                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-white/20"
+                                >
+                                  <Clock className="w-4 h-4" />
+                                  <span>🚀 PREPARING ARENA</span>
+                                </motion.div>
+                              )}
+                              {isAuctionEnded && (
+                                <div className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full text-sm font-bold shadow-lg border border-white/20">
+                                  🏁 BATTLE ENDED
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 🎮 Main Arena Display */}
+                        <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 flex-1 flex items-center justify-center min-h-[400px] max-h-[500px] overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5"></div>
+                          <img
+                            src={auction.Image || "/auction-placeholder.svg"}
+                            alt={auction.Title}
+                            className="max-h-[480px] max-w-full object-contain relative z-10 group-hover:scale-105 transition-transform duration-500"
+                            style={{ width: "auto", height: "auto" }}
+                          />
+                          
+                          {/* 🎯 Floating Stats */}
+                          <div className="absolute bottom-4 left-4 right-4 z-20">
+                            <div className="flex items-center justify-between bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1 text-gray-700">
+                                  <User className="w-4 h-4" />
+                                  <span className="font-semibold">By {auction.user.user_name}</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-gray-700">
+                                  <Eye className="w-4 h-4" />
+                                  <span className="font-semibold">{currentParticipants} watching</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {connectionStatus === 'connected' && (
+                                  <motion.div
+                                    animate={{ scale: [1, 1.1, 1] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                    className="flex items-center gap-1 text-green-600 font-bold"
+                                  >
+                                    <Wifi className="w-4 h-4" />
+                                    <span>⚡ LIVE</span>
+                                  </motion.div>
+                                )}
+                                {connectionStatus === 'connecting' && (
+                                  <div className="flex items-center gap-1 text-blue-600">
+                                    <Activity className="w-4 h-4 animate-pulse" />
+                                    <span>Connecting...</span>
+                                  </div>
+                                )}
+                                {connectionStatus === 'error' && (
+                                  <div className="flex items-center gap-1 text-orange-600">
+                                    <WifiOff className="w-4 h-4" />
+                                    <span>Limited</span>
+                                  </div>
+                                )}
+                                {connectionStatus === 'disconnected' && user && (
+                                  <div className="flex items-center gap-1 text-gray-600">
+                                    <WifiOff className="w-4 h-4" />
+                                    <span>Offline</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 🎮 Item Info Panel */}
+                        <CardContent className="p-6 bg-gradient-to-r from-white to-gray-50">
+                          <motion.h1 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3"
+                          >
+                            {auction.Title}
+                          </motion.h1>
+                          <div className="prose max-w-none">
+                            <p className="text-gray-700 leading-relaxed text-lg line-clamp-3">{auction.Description}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </div>
+
+                  {/* ⚔️ BATTLE COMMAND CENTER - Timer & Bid Controls */}
+                  <div className="lg:col-span-1">
+                    <motion.div
+                      initial={{ scale: 0.95, opacity: 0, x: 20 }}
+                      animate={{ scale: 1, opacity: 1, x: 0 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      className="h-full"
+                    >
+                      <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-lg rounded-3xl overflow-hidden h-full">
+                        <CardContent className="p-6 flex flex-col gap-6 h-full">
+                          {/* ⏰ BATTLE TIMER */}
+                          <div className="text-center">
+                            <motion.div
+                              animate={{ scale: [1, 1.02, 1] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                              className="mb-4"
+                            >
+                              <CountdownTimer startTime={auction.StartDate} endTime={auction.EndDate} isActive={isAuctionActive} />
+                            </motion.div>
+                          </div>
+
+                          {/* 🏆 CURRENT CHAMPION */}
+                          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-3">
+                              <Crown className="w-6 h-6 text-amber-600" />
+                              <span className="text-lg font-bold text-amber-800">CURRENT CHAMPION</span>
+                            </div>
+                            <motion.div
+                              key={currentPrice}
+                              initial={{ scale: 1.2, color: '#10b981' }}
+                              animate={{ scale: 1, color: '#111827' }}
+                              transition={{ duration: 0.8, type: "spring" }}
+                              className="text-4xl font-bold text-gray-900 mb-3"
+                            >
+                              ₹{currentPrice.toLocaleString('en-IN')}
+                            </motion.div>
+                            {currentHighestBidder && (
+                              <div className="flex items-center justify-center gap-2 text-gray-700">
+                                <span className="text-lg font-semibold">👑 {currentHighestBidder}</span>
+                                {connectionStatus === 'connected' && (
+                                  <motion.div
+                                    animate={{ scale: [1, 1.2, 1] }}
+                                    transition={{ duration: 1, repeat: Infinity }}
+                                    className="w-3 h-3 bg-green-500 rounded-full"
+                                  ></motion.div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          {/* ⚔️ BATTLE CONTROLS */}
+                          {isAuctionActive && user && (
+                            <div className="space-y-4">
+                              {/* 🎯 Quick Attack Buttons */}
+                              <div className="text-center mb-4">
+                                <h3 className="text-lg font-bold text-gray-800 mb-3">⚔️ QUICK ATTACKS</h3>
+                                <div className="grid grid-cols-3 gap-2">
+                                  {quickBidAmounts.map((amount, index) => (
+                                    <motion.div
+                                      key={amount}
+                                      whileHover={{ scale: 1.05 }}
+                                      whileTap={{ scale: 0.95 }}
+                                    >
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleQuickBid(amount)}
+                                        className="w-full h-12 text-sm font-bold bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 hover:from-blue-100 hover:to-cyan-100 hover:border-blue-300"
+                                      >
+                                        +₹{amount.toLocaleString('en-IN')}
+                                      </Button>
+                                    </motion.div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* 🎮 Custom Attack Input */}
+                              <div className="text-center">
+                                <h3 className="text-lg font-bold text-gray-800 mb-3">🎯 CUSTOM STRIKE</h3>
+                                <div className="flex gap-2">
+                                  <Input
+                                    type="number"
+                                    placeholder="Enter your bid amount"
+                                    value={bidAmount}
+                                    onChange={(e) => setBidAmount(e.target.value)}
+                                    className="h-12 text-base border-2 border-purple-200 focus:border-purple-500 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50"
+                                    step="0.01"
+                                    min={auction.CurrentPrice + auction.Increment}
+                                  />
+                                  <motion.div
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                  >
+                                    <Button
+                                      onClick={handlePlaceBid}
+                                      disabled={!bidAmount || connectionStatus !== 'connected'}
+                                      className="h-12 px-6 bg-gradient-to-r from-rose-500 via-pink-600 to-purple-700 hover:from-rose-600 hover:via-pink-700 hover:to-purple-800 text-white font-bold shadow-lg"
+                                    >
+                                      <Gavel className="w-5 h-5 mr-2" />
+                                      STRIKE!
+                                    </Button>
+                                  </motion.div>
+                                </div>
+                                <p className="text-xs text-gray-600 mt-2">
+                                  Min: ₹{(currentPrice + currentIncrement).toLocaleString('en-IN')}
+                                  {connectionStatus === 'connected' && (
+                                    <span className="text-green-600 ml-2 font-medium">⚡ LIVE</span>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 🚪 Login Gate */}
+                          {!user && isAuctionActive && (
+                            <motion.div
+                              whileHover={{ scale: 1.02 }}
+                              className="text-center"
+                            >
+                              <Button asChild className="w-full h-14 text-lg bg-gradient-to-r from-rose-500 via-pink-600 to-purple-700 hover:from-rose-600 hover:via-pink-700 hover:to-purple-800 font-bold shadow-lg">
+                                <Link href="/auth/login">🚪 ENTER THE ARENA</Link>
+                              </Button>
+                            </motion.div>
+                          )}
+
+                          {/* ⏳ Waiting Room */}
+                          {isAuctionNotStarted && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="text-center p-6 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-2xl"
+                            >
+                              <Clock className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+                              <h3 className="text-xl font-bold text-gray-900 mb-2">⏳ WAITING ROOM</h3>
+                              <p className="text-sm text-gray-600">
+                                Battle begins on {new Date(auction.StartDate).toLocaleDateString()}
+                              </p>
+                            </motion.div>
+                          )}
+
+                          {/* 🔧 Connection Issues */}
+                          {connectionStatus === 'error' && user && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="mt-4 p-4 bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl"
+                            >
+                              <div className="text-center">
+                                <WifiOff className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+                                <p className="text-sm text-orange-700 mb-3 font-semibold">Connection Issues</p>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={handleReconnect}
+                                  className="bg-white hover:bg-orange-50 border-orange-300 text-orange-700 font-semibold"
+                                >
+                                  <Wifi className="w-4 h-4 mr-1" />
+                                  Reconnect
+                                </Button>
+                              </div>
+                            </motion.div>
+                          )}
+
+                          {/* 🏁 Battle Results */}
+                          {isAuctionEnded && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="text-center p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-200 rounded-2xl"
+                            >
+                              <Trophy className="w-12 h-12 text-amber-600 mx-auto mb-3" />
+                              <h3 className="text-xl font-bold text-gray-900 mb-2">🏁 BATTLE RESULTS</h3>
+                              {(() => {
+                                const winnerName = auction.WinnerName || 
+                                                  (auction as any).winnerName || 
+                                                  (auction as any).winner_name ||
+                                                  (auction as any).winner?.name ||
+                                                  (auction as any).winner?.user_name ||
+                                                  (auction as any).winner?.userName ||
+                                                  (auction as any).highestBidder ||
+                                                  auction.highestBidder ||
+                                                  '';
+                                
+                                const resolveWinnerName = (winnerId: string): string => {
+                                  return resolveUserIdToUsername(winnerId);
+                                };
+                                
+                                if (!winnerName && uniqueBids.length > 0) {
+                                  const highestBid = uniqueBids[0];
+                                  return (
+                                    <div>
+                                      <p className="text-lg font-semibold text-gray-700 mb-1">
+                                        👑 Champion: <span className="text-amber-600">{highestBid.bidderName}</span>
+                                      </p>
+                                      <p className="text-sm text-gray-600">
+                                        Final Strike: ₹{highestBid.amount.toLocaleString('en-IN')}
+                                      </p>
+                                    </div>
+                                  );
+                                }
+                                
+                                if (winnerName && winnerName.trim()) {
+                                  const resolvedWinnerName = resolveWinnerName(winnerName);
+                                  return (
+                                    <p className="text-lg font-semibold text-gray-700">
+                                      👑 Champion: <span className="text-amber-600">{resolvedWinnerName}</span>
+                                    </p>
+                                  );
+                                } else {
+                                  return (
+                                    <p className="text-sm text-gray-600">No champion determined</p>
+                                  );
+                                }
+                              })()}
+                            </motion.div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Bottom Section - Bids & Stats - Only for Overview Tab */}
+          <div hidden={activeTab !== 'overview'}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Recent Bids */}
+              <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden flex flex-col h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
                     <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl">
                       <Gavel className="w-6 h-6 text-white" />
                     </div>
                     Recent Bids
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowBidHistory(!showBidHistory)}
-                    className="text-sm"
-                  >
-                    {showBidHistory ? 'Hide' : 'Show'} All
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3 sm:p-4 md:p-6">
-                {/* Real-time indicator */}
-                {connectionStatus === 'connected' && (
-                  <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
-                    <div className="flex items-center gap-2 text-green-700">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <LiveIcon className="w-4 h-4" />
-                      <span className="text-sm font-medium">Real-time bidding active</span>
-                    </div>
-                  </div>
-                )}
-                
-                <AnimatePresence>
-                  {Array.isArray(uniqueBids) && uniqueBids.length > 0 ? (
-                    <div className="space-y-3">
-                      {(showBidHistory ? uniqueBids : uniqueBids.slice(0, 8)).map((bid, index) => (
-                        <motion.div
-                          key={bid.id}
-                          initial={{ opacity: 0, x: -20, scale: 0.95 }}
-                          animate={{ opacity: 1, x: 0, scale: 1 }}
-                          exit={{ opacity: 0, x: -20, scale: 0.95 }}
-                          transition={{ 
-                            delay: index * 0.03,
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 30
-                          }}
-                          className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
-                            index === 0 ? 'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-md' : 
-                            (bid as any).isRealtime ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' : 'bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            {index === 0 && (
-                              <Crown className="w-5 h-5 text-amber-600" />
-                            )}
-                            {(bid as any).isRealtime && index !== 0 && (
-                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                            )}
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">{bid.bidderName}</span>
-                                {(bid as any).isRealtime && (
-                                  <Badge className="bg-green-100 text-green-700 text-xs px-2 py-0.5">
-                                    LIVE
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {bid.createdAt ? new Date(bid.createdAt as string).toLocaleString() : 'Just now'}
-                              </div>
-                            </div>
-                          </div>
-                          <div className={`font-bold text-lg ${index === 0 ? 'text-amber-700' : 'text-gray-900'}`}>
-                            ${bid.amount}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-600">
-                      <Gavel className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                      <p>No bids yet. Be the first to bid!</p>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-3 sm:p-4 md:p-6 flex-1">
+                  {connectionStatus === 'connected' && (
+                    <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
+                      <div className="flex items-center gap-2 text-green-700">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <LiveIcon className="w-4 h-4" />
+                        <span className="text-sm font-medium">Real-time bidding active</span>
+                      </div>
                     </div>
                   )}
-                </AnimatePresence>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Auction Stats - Takes 1 column */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl">
-                    <Star className="w-5 h-5 text-white" />
-                  </div>
-                  Auction Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                {/* Key Stats */}
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Total Bids</span>
-                    <span className="font-semibold">{Array.isArray(uniqueBids) ? uniqueBids.length : 0}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Watching</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{currentParticipants}</span>
-                      {connectionStatus === 'connected' && (
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      )}
+                  <AnimatePresence>
+                    {Array.isArray(uniqueBids) && uniqueBids.length > 0 ? (
+                      <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                        {uniqueBids.map((bid, index) => (
+                          <motion.div
+                            key={bid.id}
+                            initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -20, scale: 0.95 }}
+                            transition={{ 
+                              delay: index * 0.03,
+                              type: "spring",
+                              stiffness: 500,
+                              damping: 30
+                            }}
+                            className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
+                              index === 0 ? 'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-md' : 
+                              (bid as any).isRealtime ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' : 'bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              {index === 0 && (
+                                <Crown className="w-5 h-5 text-amber-600" />
+                              )}
+                              {(bid as any).isRealtime && index !== 0 && (
+                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              )}
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold">{bid.bidderName}</span>
+                                  {(bid as any).isRealtime && (
+                                    <Badge className="bg-green-100 text-green-700 text-xs px-2 py-0.5">
+                                      LIVE
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {bid.createdAt ? new Date(bid.createdAt as string).toLocaleString() : 'Just now'}
+                                </div>
+                              </div>
+                            </div>
+                            <div className={`font-bold text-lg ${index === 0 ? 'text-amber-700' : 'text-gray-900'}`}>
+                              ₹{bid.amount.toLocaleString('en-IN')}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-600">
+                        <Gavel className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                        <p>No bids yet. Be the first to bid!</p>
+                      </div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+              {/* Auction Details */}
+              <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden flex flex-col h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl">
+                      <Star className="w-5 h-5 text-white" />
+                    </div>
+                    Auction Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6 flex-1 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Total Bids</span>
+                      <span className="font-semibold">{Array.isArray(uniqueBids) ? uniqueBids.length : 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Watching</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">{currentParticipants}</span>
+                        {connectionStatus === 'connected' && (
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Participants</span>
+                      <span className="font-semibold">{(auction.participants || []).length}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Status</span>
+                      <span className={`font-semibold ${
+                        isAuctionActive ? 'text-green-600' : 
+                        isAuctionNotStarted ? 'text-blue-600' :
+                        isAuctionEnded ? 'text-red-600' : 'text-gray-600'
+                      }`}>
+                        {isAuctionNotStarted ? 'NOT STARTED' : 
+                         isAuctionActive ? 'ACTIVE' : 
+                         isAuctionEnded ? 'ENDED' : auction.Status}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Participants</span>
-                    <span className="font-semibold">{(auction.participants || []).length}</span>
+                  <div className="pt-4 border-t border-gray-200 space-y-4">
+                    <div className="bg-gray-50 rounded-xl p-4 text-center">
+                      <DollarSign className="w-6 h-6 text-gray-600 mx-auto mb-2" />
+                      <div className="text-sm text-gray-600">Starting Price</div>
+                      <div className="font-bold text-lg">₹{auction.StartingPrice.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-4 text-center">
+                      <TrendingUp className="w-6 h-6 text-gray-600 mx-auto mb-2" />
+                      <div className="text-sm text-gray-600">Increment</div>
+                      <div className="font-bold text-lg">₹{auction.Increment.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-4 text-center">
+                      <Calendar className="w-6 h-6 text-gray-600 mx-auto mb-2" />
+                      <div className="text-sm text-gray-600">Started</div>
+                      <div className="font-bold text-sm">{new Date(auction.StartDate).toLocaleDateString()}</div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Status</span>
-                    <span className={`font-semibold ${
-                      isAuctionActive ? 'text-green-600' : 
-                      isAuctionNotStarted ? 'text-blue-600' :
-                      isAuctionEnded ? 'text-red-600' : 'text-gray-600'
-                    }`}>
-                      {isAuctionNotStarted ? 'NOT STARTED' : 
-                       isAuctionActive ? 'ACTIVE' : 
-                       isAuctionEnded ? 'ENDED' : auction.Status}
-                    </span>
+                  <div className="pt-4 border-t border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {auction.Description}
+                    </p>
                   </div>
-                </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
 
-                {/* Detailed Info */}
-                <div className="pt-4 border-t border-gray-200 space-y-4">
-                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                    <DollarSign className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-                    <div className="text-sm text-gray-600">Starting Price</div>
-                    <div className="font-bold text-lg">${auction.StartingPrice}</div>
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                    <TrendingUp className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-                    <div className="text-sm text-gray-600">Increment</div>
-                    <div className="font-bold text-lg">${auction.Increment}</div>
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                    <Calendar className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-                    <div className="text-sm text-gray-600">Started</div>
-                    <div className="font-bold text-sm">{new Date(auction.StartDate).toLocaleDateString()}</div>
-                  </div>
-                </div>
 
-                {/* Auction description */}
-                <div className="pt-4 border-t border-gray-200">
-                  <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {auction.Description}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+
+          {/* Live Stream Tab */}
+          <div hidden={activeTab !== 'live'}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="live"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="mb-6"
+                >
+                  <AuctionRoom 
+                    auctionId={auction.ID}
+                    userName={user?.user_name}
+                    userId={user?.id}
+                    isActive={isAuctionActive}
+                    participants={currentParticipants}
+                    token={user?.token}
+                  />
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          
+          {/* Analytics Tab */}
+          <div hidden={activeTab !== 'analytics'}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="analytics"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="mb-6"
+                >
+                   <LiveBiddingChart 
+                     auctionId={auction.ID}
+                     currentUserName={user?.user_name}
+                     startingPrice={auction.StartingPrice}
+                     isActive={isAuctionActive}
+                   />
+                 </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
@@ -1363,10 +1513,10 @@ export default function AuctionPage() {
             setCongratsVisible(false);
             setWinnerData(null);
           }}
-          winnerName={winnerData.winnerName}
-          auctionTitle={winnerData.auctionTitle}
-          finalBid={winnerData.finalBid}
-          auctionImage={winnerData.auctionImage}
+          winnerName={winnerData?.winnerName || ''}
+          auctionTitle={winnerData?.auctionTitle || ''}
+          finalBid={winnerData?.finalBid || 0}
+          auctionImage={winnerData?.auctionImage || ''}
         />
       )}
     </div>

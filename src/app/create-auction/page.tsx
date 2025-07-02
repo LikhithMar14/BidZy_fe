@@ -108,15 +108,17 @@ export default function CreateAuctionPage() {
       const diffInMs = end.getTime() - start.getTime();
       
       if (diffInMs > 0) {
-        const diffInHours = Math.round(diffInMs / (1000 * 60 * 60));
-        const days = Math.floor(diffInHours / 24);
-        const hours = diffInHours % 24;
-        
-        if (days > 0) {
-          setCalculatedDuration(`${days} day${days > 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''}`);
-        } else {
-          setCalculatedDuration(`${hours} hour${hours !== 1 ? 's' : ''}`);
-        }
+        const totalMinutes = Math.round(diffInMs / (1000 * 60));
+        const days = Math.floor(totalMinutes / (60 * 24));
+        const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+        const minutes = totalMinutes % 60;
+
+        let durationStr = "";
+        if (days > 0) durationStr += `${days} day${days > 1 ? 's' : ''} `;
+        if (hours > 0 || days > 0) durationStr += `${hours} hour${hours !== 1 ? 's' : ''} `;
+        durationStr += `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+
+        setCalculatedDuration(durationStr.trim());
       } else {
         setCalculatedDuration("");
       }
@@ -462,7 +464,7 @@ export default function CreateAuctionPage() {
                               name="startingPrice"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">Starting Price ($)</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-gray-900">Starting Price (INR)</FormLabel>
                                   <FormControl>
                                     <Input 
                                       type="number"
@@ -484,7 +486,7 @@ export default function CreateAuctionPage() {
                               name="increment"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">Bid Increment ($)</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-gray-900">Bid Increment (INR)</FormLabel>
                                   <FormControl>
                                     <Input 
                                       type="number"
