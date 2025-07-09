@@ -46,27 +46,9 @@ function AuthCallbackContent() {
 
   const handleAuthSuccess = useCallback(async (userInfo: any, authToken: string, isNewUser: boolean = false) => {
     try {
-      console.log('handleAuthSuccess called with:', { userInfo, authToken, isNewUser })
-      
-      // Handle both direct user object and nested data structure
-      let userData
-      if (userInfo.data) {
-        userData = userInfo.data
-      } else if (userInfo.id || userInfo.user_id) {
-        userData = userInfo
-      } else {
-        console.error('Unexpected userInfo structure:', userInfo)
-        throw new Error('Invalid user data structure')
-      }
-      
-      const userId = userData.user_id || userData.id
-      const username = userData.user_name || userData.username
-      const email = userData.email
-      
-      console.log('Extracted user data:', { userId, username, email })
+      const { user_id: userId, user_name: username, email } = userInfo.data
       
       if (!authToken || !userId || !username || !email) {
-        console.error('Missing required data:', { authToken: !!authToken, userId, username, email })
         throw new Error('Missing required authentication data')
       }
 
@@ -116,8 +98,6 @@ function AuthCallbackContent() {
     const email = searchParams.get('email')
     const isNewUser = searchParams.get('is_new_user') === 'true'
     
-    console.log('URL parameters received:', { success, token: token ? 'present' : 'missing', userId, username, email, isNewUser })
-    
     if (success !== 'true') {
       handleAuthError(
         'Google authentication failed',
@@ -137,20 +117,19 @@ function AuthCallbackContent() {
         throw new Error('No authentication token received')
       }
 
-          // If we have user data from URL parameters, use it directly
-    if (userId && username && email) {
-      console.log('Using user data from URL parameters:', { userId, username, email })
-      const user = {
-        id: userId,
-        user_name: username,
-        username,
-        email,
-        createdAt: '',
-        updatedAt: ''
-      }
-      
-      await handleAuthSuccess({ data: user }, authToken, isNewUser)
-    } else {
+      // If we have user data from URL parameters, use it directly
+      if (userId && username && email) {
+        const user = {
+          id: userId,
+          user_name: username,
+          username,
+          email,
+          createdAt: '',
+          updatedAt: ''
+        }
+        
+        await handleAuthSuccess({ data: user }, authToken, isNewUser)
+      } else {
         // Fallback to fetching user info from API
         const userInfo = await fetchUserInfoWithToken(authToken)
         

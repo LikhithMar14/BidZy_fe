@@ -1,69 +1,60 @@
-"use client";
-
-import React, { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { motion } from "framer-motion";
-import { 
-  Upload, 
-  Calendar, 
-  DollarSign, 
-  Clock, 
-  Tag, 
-  FileText, 
-  Image as ImageIcon,
+"use client"
+import type React from "react"
+import { useState, useRef, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { motion } from "framer-motion"
+import {
+  Upload,
+  DollarSign,
+  Tag,
+  FileText,
+  ImageIcon,
   X,
-  Plus,
   Gavel,
   ArrowLeft,
   Sparkles,
   Star,
   Zap,
   CheckCircle,
-  Timer
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+  Timer,
+} from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { createAuction, getImageUploadUrl, uploadImageToS3 } from "@/connecting/auction"
+import { Category, Status, type CreateAuctionRequest } from "@/types/auction"
+import { useAuth } from "@/hooks/useAuth"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+const createAuctionSchema = z
+  .object({
+    title: z.string().min(3, "Title must be at least 3 characters"),
+    description: z.string().min(10, "Description must be at least 10 characters"),
+    startingPrice: z.number().min(0.01, "Starting price must be greater than 0"),
+    increment: z.number().min(0.01, "Increment must be greater than 0"),
+    categoryIds: z.array(z.number()).min(1, "Please select at least one category"),
+    startDateTime: z.string().min(1, "Start date and time is required"),
+    endDateTime: z.string().min(1, "End date and time is required"),
+  })
+  .refine(
+    (data) => {
+      const startDate = new Date(data.startDateTime)
+      const endDate = new Date(data.endDateTime)
+      return endDate > startDate
+    },
+    {
+      message: "End date must be after start date",
+      path: ["endDateTime"],
+    },
+  )
 
-import { createAuction, getImageUploadUrl, uploadImageToS3 } from "@/connecting/auction";
-import { Category, Status, type CreateAuctionRequest } from "@/types/auction";
-import { useAuth } from "@/hooks/useAuth";
-
-const createAuctionSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  startingPrice: z.number().min(0.01, "Starting price must be greater than 0"),
-  increment: z.number().min(0.01, "Increment must be greater than 0"),
-  categoryIds: z.array(z.number()).min(1, "Please select at least one category"),
-  startDateTime: z.string().min(1, "Start date and time is required"),
-  endDateTime: z.string().min(1, "End date and time is required"),
-}).refine((data) => {
-  const startDate = new Date(data.startDateTime);
-  const endDate = new Date(data.endDateTime);
-  return endDate > startDate;
-}, {
-  message: "End date must be after start date",
-  path: ["endDateTime"],
-});
-
-type CreateAuctionForm = z.infer<typeof createAuctionSchema>;
+type CreateAuctionForm = z.infer<typeof createAuctionSchema>
 
 const categories = [
   { id: Category.ART, name: "Art", icon: "🎨", gradient: "from-rose-500 to-pink-600" },
@@ -72,17 +63,17 @@ const categories = [
   { id: Category.FASHION, name: "Fashion", icon: "👗", gradient: "from-emerald-500 to-teal-600" },
   { id: Category.HOME, name: "Home", icon: "🏠", gradient: "from-blue-500 to-cyan-600" },
   { id: Category.OTHER, name: "Other", icon: "📦", gradient: "from-gray-500 to-slate-600" },
-];
+]
 
 export default function CreateAuctionPage() {
-  const router = useRouter();
-  const { user } = useAuth();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [calculatedDuration, setCalculatedDuration] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter()
+  const { user } = useAuth()
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [calculatedDuration, setCalculatedDuration] = useState<string>("")
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<CreateAuctionForm>({
     resolver: zodResolver(createAuctionSchema),
@@ -95,106 +86,121 @@ export default function CreateAuctionPage() {
       startDateTime: "",
       endDateTime: "",
     },
-  });
+  })
 
   // Watch for date changes to calculate duration automatically
-  const startDateTime = form.watch("startDateTime");
-  const endDateTime = form.watch("endDateTime");
+  const startDateTime = form.watch("startDateTime")
+  const endDateTime = form.watch("endDateTime")
 
   useEffect(() => {
     if (startDateTime && endDateTime) {
-      const start = new Date(startDateTime);
-      const end = new Date(endDateTime);
-      const diffInMs = end.getTime() - start.getTime();
-      
+      const start = new Date(startDateTime)
+      const end = new Date(endDateTime)
+      const diffInMs = end.getTime() - start.getTime()
+
       if (diffInMs > 0) {
-        const totalMinutes = Math.round(diffInMs / (1000 * 60));
-        const days = Math.floor(totalMinutes / (60 * 24));
-        const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-        const minutes = totalMinutes % 60;
+        const totalMinutes = Math.round(diffInMs / (1000 * 60))
+        const days = Math.floor(totalMinutes / (60 * 24))
+        const hours = Math.floor((totalMinutes % (60 * 24)) / 60)
+        const minutes = totalMinutes % 60
 
-        let durationStr = "";
-        if (days > 0) durationStr += `${days} day${days > 1 ? 's' : ''} `;
-        if (hours > 0 || days > 0) durationStr += `${hours} hour${hours !== 1 ? 's' : ''} `;
-        durationStr += `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+        let durationStr = ""
+        if (days > 0) durationStr += `${days} day${days > 1 ? "s" : ""} `
+        if (hours > 0 || days > 0) durationStr += `${hours} hour${hours !== 1 ? "s" : ""} `
+        durationStr += `${minutes} minute${minutes !== 1 ? "s" : ""}`
 
-        setCalculatedDuration(durationStr.trim());
+        setCalculatedDuration(durationStr.trim())
       } else {
-        setCalculatedDuration("");
+        setCalculatedDuration("")
       }
     } else {
-      setCalculatedDuration("");
+      setCalculatedDuration("")
     }
-  }, [startDateTime, endDateTime]);
+  }, [startDateTime, endDateTime])
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
-      if (file.size > 10 * 1024 * 1024) { 
-        toast.error("Image size must be less than 10MB");
-        return;
-      }
-      
-      if (!file.type.startsWith('image/')) {
-        toast.error("Please select a valid image file");
-        return;
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Image size must be less than 10MB")
+        return
       }
 
-      setSelectedFile(file);
-      const reader = new FileReader();
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please select a valid image file")
+        return
+      }
+
+      setSelectedFile(file)
+      const reader = new FileReader()
       reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   const removeImage = () => {
-    setSelectedFile(null);
-    setImagePreview(null);
+    setSelectedFile(null)
+    setImagePreview(null)
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = ""
     }
-  };
+  }
 
   const toggleCategory = (categoryId: number) => {
     const updatedCategories = selectedCategories.includes(categoryId)
-      ? selectedCategories.filter(id => id !== categoryId)
-      : [...selectedCategories, categoryId];
-    
-    setSelectedCategories(updatedCategories);
-    form.setValue('categoryIds', updatedCategories);
-  };
+      ? selectedCategories.filter((id) => id !== categoryId)
+      : [...selectedCategories, categoryId]
+
+    setSelectedCategories(updatedCategories)
+    form.setValue("categoryIds", updatedCategories)
+  }
 
   const onSubmit = async (data: CreateAuctionForm) => {
-    if (!user?.id) {
+    console.log("On submit clicked")
+    if (user?.id) {
+      // Check if user is admin
+      if (user.email !== "likhithcvsrl@gmail.com" && user.email !== "likhithcvsrl@gmail.com") {
+        toast.error("You are not the admin");
+        return;
+      }
+    } else {
       toast.error("Please log in to create an auction");
       return;
     }
+    console.log("User",user)
 
-    if (!selectedFile) {
-      toast.error("Please upload an image for your auction");
-      return;
+    // Check if user is admin
+    if (user.email !== "likhithcvsrl@gmail.com" && user.email !== "likhithcvsrl@gmail.com") {
+      console.log("User", user)
+      toast.error("You are not the admin")
+      return
     }
 
-    setIsSubmitting(true);
+    if (!selectedFile) {
+      toast.info(user)
+      toast.error("Please upload an image for your auction")
+      return
+    }
 
+    setIsSubmitting(true)
     try {
-      const startDateUTC = new Date(data.startDateTime).toISOString().replace(/\.\d{3}Z$/, 'Z');
-      const endDateUTC = new Date(data.endDateTime).toISOString().replace(/\.\d{3}Z$/, 'Z');
-      
-      const durationInHours = Math.round((new Date(endDateUTC).getTime() - new Date(startDateUTC).getTime()) / (1000 * 60 * 60));
+      const startDateUTC = new Date(data.startDateTime).toISOString().replace(/\.\d{3}Z$/, "Z")
+      const endDateUTC = new Date(data.endDateTime).toISOString().replace(/\.\d{3}Z$/, "Z")
+      const durationInHours = Math.round(
+        (new Date(endDateUTC).getTime() - new Date(startDateUTC).getTime()) / (1000 * 60 * 60),
+      )
 
-      const tempAuctionId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
+      const tempAuctionId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
       const uploadResponse = await getImageUploadUrl({
         fileName: selectedFile.name,
         contentType: selectedFile.type,
         auctionId: tempAuctionId,
-      });
+      })
 
-
-      await uploadImageToS3(uploadResponse.data.uploadUrl, selectedFile);
+      await uploadImageToS3(uploadResponse.data.uploadUrl, selectedFile)
 
       const auctionData: CreateAuctionRequest = {
         title: data.title,
@@ -208,22 +214,20 @@ export default function CreateAuctionPage() {
         startDateTime: startDateUTC,
         endDateTime: endDateUTC,
         status: Status.INACTIVE,
-      };
+      }
 
-
-      await createAuction(auctionData);
-      
+      await createAuction(auctionData)
       toast.success("Auction created successfully!", {
-        description: "Your auction is now live and accepting bids!"
-      });
-      router.push("/"); 
+        description: "Your auction is now live and accepting bids!",
+      })
+      router.push("/")
     } catch (error: any) {
-      console.error("Error creating auction:", error);
-      toast.error(error.message || "Failed to create auction. Please try again.");
+      console.error("Error creating auction:", error)
+      toast.error(error.message || "Failed to create auction. Please try again.")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-500 via-pink-600 to-purple-700 relative overflow-hidden">
@@ -244,22 +248,18 @@ export default function CreateAuctionPage() {
       <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-violet-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
 
       <div className="relative container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
           {/* Header */}
           <div className="mb-8">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors font-medium"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Home
             </Link>
-            
-            <motion.div 
+
+            <motion.div
               className="flex items-center gap-4 mb-3"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -272,7 +272,7 @@ export default function CreateAuctionPage() {
                 <motion.div
                   className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
                   animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                 >
                   <Sparkles className="h-4 w-4 text-white" />
                 </motion.div>
@@ -284,14 +284,12 @@ export default function CreateAuctionPage() {
                     Auction
                   </span>
                 </h1>
-                <p className="text-rose-100 text-lg sm:text-xl mt-2">
-                  Share your treasures with bidders worldwide
-                </p>
+                <p className="text-rose-100 text-lg sm:text-xl mt-2">Share your treasures with bidders worldwide</p>
               </div>
             </motion.div>
 
             {/* Trust indicators */}
-            <motion.div 
+            <motion.div
               className="flex flex-wrap items-center gap-6 text-sm text-white/90"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -323,10 +321,7 @@ export default function CreateAuctionPage() {
                   {/* Main Content */}
                   <div className="lg:col-span-2 space-y-6">
                     {/* Basic Information */}
-                    <motion.div
-                      whileHover={{ y: -2 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                       <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
                         <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
                           <CardTitle className="flex items-center gap-3 text-2xl">
@@ -347,10 +342,10 @@ export default function CreateAuctionPage() {
                               <FormItem>
                                 <FormLabel className="text-lg font-semibold text-gray-900">Auction Title</FormLabel>
                                 <FormControl>
-                                  <Input 
+                                  <Input
                                     placeholder="Enter a compelling title for your auction"
                                     className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
-                                    {...field} 
+                                    {...field}
                                   />
                                 </FormControl>
                                 <FormDescription className="text-base">
@@ -368,10 +363,10 @@ export default function CreateAuctionPage() {
                               <FormItem>
                                 <FormLabel className="text-lg font-semibold text-gray-900">Description</FormLabel>
                                 <FormControl>
-                                  <Textarea 
+                                  <Textarea
                                     placeholder="Describe your item in detail - condition, history, special features..."
                                     className="min-h-[140px] text-base border-2 focus:border-rose-500 rounded-xl"
-                                    {...field} 
+                                    {...field}
                                   />
                                 </FormControl>
                                 <FormDescription className="text-base">
@@ -386,10 +381,7 @@ export default function CreateAuctionPage() {
                     </motion.div>
 
                     {/* Categories */}
-                    <motion.div
-                      whileHover={{ y: -2 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                       <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
                         <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
                           <CardTitle className="flex items-center gap-3 text-2xl">
@@ -412,7 +404,7 @@ export default function CreateAuctionPage() {
                                 className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
                                   selectedCategories.includes(category.id)
                                     ? `border-transparent shadow-xl bg-gradient-to-r ${category.gradient} text-white scale-105`
-                                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 bg-white'
+                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 bg-white"
                                 }`}
                                 whileHover={{ scale: selectedCategories.includes(category.id) ? 1.05 : 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -441,10 +433,7 @@ export default function CreateAuctionPage() {
                     </motion.div>
 
                     {/* Pricing & Timing */}
-                    <motion.div
-                      whileHover={{ y: -2 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                       <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
                         <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
                           <CardTitle className="flex items-center gap-3 text-2xl">
@@ -453,9 +442,7 @@ export default function CreateAuctionPage() {
                             </div>
                             Pricing & Timing
                           </CardTitle>
-                          <CardDescription className="text-base">
-                            Set your auction parameters
-                          </CardDescription>
+                          <CardDescription className="text-base">Set your auction parameters</CardDescription>
                         </CardHeader>
                         <CardContent className="p-8 space-y-8">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -464,16 +451,18 @@ export default function CreateAuctionPage() {
                               name="startingPrice"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">Starting Price (INR)</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-gray-900">
+                                    Starting Price (INR)
+                                  </FormLabel>
                                   <FormControl>
-                                    <Input 
+                                    <Input
                                       type="number"
                                       step="0.01"
                                       min="0.01"
                                       placeholder="0.00"
                                       className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
                                       {...field}
-                                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                      onChange={(e) => field.onChange(Number.parseFloat(e.target.value) || 0)}
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -486,16 +475,18 @@ export default function CreateAuctionPage() {
                               name="increment"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">Bid Increment (INR)</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-gray-900">
+                                    Bid Increment (INR)
+                                  </FormLabel>
                                   <FormControl>
-                                    <Input 
+                                    <Input
                                       type="number"
                                       step="0.01"
                                       min="0.01"
                                       placeholder="1.00"
                                       className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
                                       {...field}
-                                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                      onChange={(e) => field.onChange(Number.parseFloat(e.target.value) || 0)}
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -510,17 +501,17 @@ export default function CreateAuctionPage() {
                               name="startDateTime"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">Start Date & Time</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-gray-900">
+                                    Start Date & Time
+                                  </FormLabel>
                                   <FormControl>
-                                    <Input 
+                                    <Input
                                       type="datetime-local"
                                       className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
                                       {...field}
                                     />
                                   </FormControl>
-                                  <FormDescription>
-                                    When should the auction start?
-                                  </FormDescription>
+                                  <FormDescription>When should the auction start?</FormDescription>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -533,15 +524,13 @@ export default function CreateAuctionPage() {
                                 <FormItem>
                                   <FormLabel className="text-lg font-semibold text-gray-900">End Date & Time</FormLabel>
                                   <FormControl>
-                                    <Input 
+                                    <Input
                                       type="datetime-local"
                                       className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
                                       {...field}
                                     />
                                   </FormControl>
-                                  <FormDescription>
-                                    When should the auction end?
-                                  </FormDescription>
+                                  <FormDescription>When should the auction end?</FormDescription>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -574,10 +563,7 @@ export default function CreateAuctionPage() {
                   {/* Sidebar */}
                   <div className="space-y-6">
                     {/* Image Upload */}
-                    <motion.div
-                      whileHover={{ y: -2 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                       <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
                         <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
                           <CardTitle className="flex items-center gap-3 text-xl">
@@ -586,20 +572,18 @@ export default function CreateAuctionPage() {
                             </div>
                             Auction Image
                           </CardTitle>
-                          <CardDescription>
-                            Upload a high-quality image of your item
-                          </CardDescription>
+                          <CardDescription>Upload a high-quality image of your item</CardDescription>
                         </CardHeader>
                         <CardContent className="p-6">
                           <div className="space-y-4">
                             {imagePreview ? (
-                              <motion.div 
+                              <motion.div
                                 className="relative"
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                               >
                                 <img
-                                  src={imagePreview}
+                                  src={imagePreview || "/placeholder.svg"}
                                   alt="Preview"
                                   className="w-full h-56 object-cover rounded-xl border-2 border-gray-200 shadow-lg"
                                 />
@@ -623,15 +607,11 @@ export default function CreateAuctionPage() {
                                 <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                   <Upload className="w-8 h-8 text-white" />
                                 </div>
-                                <p className="text-gray-700 font-medium mb-2">
-                                  Click to upload or drag and drop
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  PNG, JPG, JPEG up to 10MB
-                                </p>
+                                <p className="text-gray-700 font-medium mb-2">Click to upload or drag and drop</p>
+                                <p className="text-sm text-gray-500">PNG, JPG, JPEG up to 10MB</p>
                               </motion.div>
                             )}
-                            
+
                             <input
                               ref={fileInputRef}
                               type="file"
@@ -639,7 +619,7 @@ export default function CreateAuctionPage() {
                               onChange={handleImageUpload}
                               className="hidden"
                             />
-                            
+
                             <Button
                               type="button"
                               variant="outline"
@@ -647,7 +627,7 @@ export default function CreateAuctionPage() {
                               className="w-full h-12 text-base border-2 rounded-xl hover:bg-gray-50"
                             >
                               <Upload className="w-4 h-4 mr-2" />
-                              {imagePreview ? 'Change Image' : 'Upload Image'}
+                              {imagePreview ? "Change Image" : "Upload Image"}
                             </Button>
                           </div>
                         </CardContent>
@@ -655,10 +635,7 @@ export default function CreateAuctionPage() {
                     </motion.div>
 
                     {/* Submit Button */}
-                    <motion.div
-                      whileHover={{ y: -2 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                       <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
                         <CardContent className="p-6">
                           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -669,10 +646,10 @@ export default function CreateAuctionPage() {
                             >
                               {isSubmitting ? (
                                 <div className="flex items-center gap-3">
-                                  <motion.div 
+                                  <motion.div
                                     className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full"
                                     animate={{ rotate: 360 }}
-                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                                   />
                                   Creating Auction...
                                 </div>
@@ -704,7 +681,7 @@ export default function CreateAuctionPage() {
         animate={{ y: [-10, 10, -10] }}
         transition={{
           duration: 3,
-          repeat: Infinity,
+          repeat: Number.POSITIVE_INFINITY,
           ease: "easeInOut",
         }}
         className="absolute top-20 right-20 w-20 h-20 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center shadow-2xl"
@@ -716,7 +693,7 @@ export default function CreateAuctionPage() {
         animate={{ y: [10, -10, 10] }}
         transition={{
           duration: 4,
-          repeat: Infinity,
+          repeat: Number.POSITIVE_INFINITY,
           ease: "easeInOut",
         }}
         className="absolute bottom-20 left-20 w-16 h-16 bg-gradient-to-r from-violet-400 to-purple-400 rounded-full flex items-center justify-center shadow-2xl"
@@ -724,5 +701,5 @@ export default function CreateAuctionPage() {
         <Zap className="w-8 h-8 text-violet-800" />
       </motion.div>
     </div>
-  );
-} 
+  )
+}
