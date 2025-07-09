@@ -169,10 +169,10 @@ export default function CreateAuctionPage() {
   const onSubmit = async (data: CreateAuctionForm) => {
     if (!user?.id) {
       toast.error("Please log in to create an auction");
-      if(user.email !== "likhithcvsrl@gmail.com"){
-        toast.warning("Only admin can create the auction")
-      }
       return;
+    }
+    if(user.email !== "likhithcvsrl@gmail.com"){
+      toast.warning("Only admin can create the auction")
     }
 
     if (!selectedFile) {
