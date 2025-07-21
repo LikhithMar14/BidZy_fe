@@ -120,17 +120,18 @@ const handleGoogleLogin = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.3 }}
+      className="w-full"
     >
-      <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl rounded-2xl overflow-hidden">
-        <CardContent className="p-8">
+      <Card className="shadow-2xl border border-gray-700/50 bg-gray-900/90 backdrop-blur-xl rounded-xl overflow-hidden">
+        <CardContent className="p-6 sm:p-8">
           {/* Toggle Buttons */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-8">
+          <div className="flex bg-gray-800 rounded-xl p-1 mb-6">
             <button
               onClick={() => setIsLogin(true)}
               className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
                 isLogin
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg transform scale-105'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg transform scale-105'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
               }`}
             >
               Sign In
@@ -139,8 +140,8 @@ const handleGoogleLogin = () => {
               onClick={() => setIsLogin(false)}
               className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
                 !isLogin
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg transform scale-105'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg transform scale-105'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
               }`}
             >
               Sign Up
@@ -154,7 +155,7 @@ const handleGoogleLogin = () => {
               onClick={handleGoogleLogin}
               disabled={isGoogleLoading}
               variant="outline"
-              className="w-full h-12 border-gray-300 hover:bg-gray-50 hover:border-rose-300 transition-all duration-300 rounded-xl font-semibold shadow-lg hover:shadow-xl"
+              className="w-full h-12 border-gray-700 bg-gray-800 text-white hover:bg-gray-700 hover:border-emerald-500 transition-all duration-300 rounded-xl font-semibold shadow-lg hover:shadow-xl"
             >
               {isGoogleLoading ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -168,10 +169,10 @@ const handleGoogleLogin = () => {
 
           <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <div className="w-full border-t border-gray-700" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">Or continue with email</span>
+              <span className="px-4 bg-gray-900 text-gray-400 font-medium">Or continue with email</span>
             </div>
           </div>
 
@@ -185,56 +186,54 @@ const handleGoogleLogin = () => {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
               >
-                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Email</label>
+                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-gray-300">Email</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         {...loginForm.register('email')}
                         type="email"
                         placeholder="Enter your email"
-                        className="pl-10 h-12 border-gray-300 focus:border-rose-500 focus:ring-rose-500 rounded-xl transition-all duration-300"
+                        className="pl-10 h-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg transition-all duration-300"
                       />
                     </div>
                     {loginForm.formState.errors.email && (
-                      <p className="text-sm text-red-600 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-1" />
+                      <p className="text-xs text-red-600 flex items-center mt-1">
+                        <AlertCircle className="w-3 h-3 mr-1" />
                         {loginForm.formState.errors.email.message}
                       </p>
                     )}
                   </div>
 
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Password</label>
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-gray-300">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         {...loginForm.register('password')}
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Enter your password"
-                        className="pl-10 pr-10 h-12 border-gray-300 focus:border-rose-500 focus:ring-rose-500 rounded-xl transition-all duration-300"
+                        className="pl-10 pr-10 h-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg transition-all duration-300"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                     {loginForm.formState.errors.password && (
-                      <p className="text-sm text-red-600 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-1" />
+                      <p className="text-xs text-red-600 flex items-center mt-1">
+                        <AlertCircle className="w-3 h-3 mr-1" />
                         {loginForm.formState.errors.password.message}
                       </p>
                     )}
                   </div>
 
-
                   <div className="flex items-center justify-end">
-                    <a href="#" className="text-sm text-rose-600 hover:text-rose-500 font-medium transition-colors">
+                    <a href="#" className="text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
                       Forgot password?
                     </a>
                   </div>
@@ -242,7 +241,7 @@ const handleGoogleLogin = () => {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-xl"
+                    className="w-full h-11 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-lg"
                     disabled={isLoginPending}
                   >
                     {isLoginPending ? (
@@ -267,61 +266,61 @@ const handleGoogleLogin = () => {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
               >
-                <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Username</label>
+                <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-gray-300">Username</label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         {...registerForm.register('user_name')}
                         type="text"
                         placeholder="Choose a username"
-                        className="pl-10 h-12 border-gray-300 focus:border-rose-500 focus:ring-rose-500 rounded-xl transition-all duration-300"
+                        className="pl-10 h-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg transition-all duration-300"
                       />
                     </div>
                     {registerForm.formState.errors.user_name && (
-                      <p className="text-sm text-red-600 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-1" />
+                      <p className="text-xs text-red-600 flex items-center mt-1">
+                        <AlertCircle className="w-3 h-3 mr-1" />
                         {registerForm.formState.errors.user_name.message}
                       </p>
                     )}
                   </div>
 
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Email</label>
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-gray-300">Email</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         {...registerForm.register('email')}
                         type="email"
                         placeholder="Enter your email"
-                        className="pl-10 h-12 border-gray-300 focus:border-rose-500 focus:ring-rose-500 rounded-xl transition-all duration-300"
+                        className="pl-10 h-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg transition-all duration-300"
                       />
                     </div>
                     {registerForm.formState.errors.email && (
-                      <p className="text-sm text-red-600 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-1" />
+                      <p className="text-xs text-red-600 flex items-center mt-1">
+                        <AlertCircle className="w-3 h-3 mr-1" />
                         {registerForm.formState.errors.email.message}
                       </p>
                     )}
                   </div>
 
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Password</label>
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-gray-300">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         {...registerForm.register('password')}
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Create a strong password"
-                        className="pl-10 pr-10 h-12 border-gray-300 focus:border-rose-500 focus:ring-rose-500 rounded-xl transition-all duration-300"
+                        className="pl-10 pr-10 h-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg transition-all duration-300"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -329,7 +328,7 @@ const handleGoogleLogin = () => {
                    
                     {/* Password Strength Indicator */}
                     {currentPassword && (
-                      <div className="mt-2">
+                      <div className="mt-1">
                         <div className="flex items-center gap-2 mb-1">
                           <div className="flex gap-1">
                             {[1, 2, 3, 4, 5].map((level) => {
@@ -346,66 +345,64 @@ const handleGoogleLogin = () => {
                           </div>
                           <span className="text-xs text-gray-500 font-medium">{passwordStrength(currentPassword).text}</span>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number
+                        <div className="text-xs text-gray-400">
+                          Password must contain at least 8 characters, one uppercase, lowercase, and number
                         </div>
                       </div>
                     )}
                    
                     {registerForm.formState.errors.password && (
-                      <p className="text-sm text-red-600 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-1" />
+                      <p className="text-xs text-red-600 flex items-center mt-1">
+                        <AlertCircle className="w-3 h-3 mr-1" />
                         {registerForm.formState.errors.password.message}
                       </p>
                     )}
                   </div>
 
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Confirm Password</label>
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-gray-300">Confirm Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         {...registerForm.register('confirmPassword')}
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm your password"
-                        className="pl-10 pr-10 h-12 border-gray-300 focus:border-rose-500 focus:ring-rose-500 rounded-xl transition-all duration-300"
+                        className="pl-10 pr-10 h-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg transition-all duration-300"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                       >
                         {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                     {registerForm.formState.errors.confirmPassword && (
-                      <p className="text-sm text-red-600 flex items-center">
-                        <AlertCircle className="w-4 h-4 mr-1" />
+                      <p className="text-xs text-red-600 flex items-center mt-1">
+                        <AlertCircle className="w-3 h-3 mr-1" />
                         {registerForm.formState.errors.confirmPassword.message}
                       </p>
                     )}
                   </div>
 
-
                   <div className="flex items-start">
                     <input
                       type="checkbox"
-                      className="mt-1 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+                      className="mt-1 rounded border-gray-700 bg-gray-800 text-emerald-500 focus:ring-emerald-500"
                       required
                     />
-                    <label className="ml-2 text-sm text-gray-600 font-medium">
+                    <label className="ml-2 text-sm text-gray-300 font-medium">
                       I agree to the{' '}
-                      <a href="#" className="text-rose-600 hover:text-rose-500 font-semibold transition-colors">Terms of Service</a>
+                      <a href="#" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors">Terms of Service</a>
                       {' '}and{' '}
-                      <a href="#" className="text-rose-600 hover:text-rose-500 font-semibold transition-colors">Privacy Policy</a>
+                      <a href="#" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors">Privacy Policy</a>
                     </label>
                   </div>
 
-
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-xl"
+                    className="w-full h-10 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-lg"
                     disabled={isRegisterPending}
                   >
                     {isRegisterPending ? (
@@ -426,17 +423,17 @@ const handleGoogleLogin = () => {
           </AnimatePresence>
 
 
-          {/* Additional Info */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="flex items-center justify-center text-sm text-gray-600 font-medium">
-              <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+          {/* Additional Info
+          <div className="mt-6 pt-4 border-t border-gray-700">
+            <div className="flex items-center justify-center text-sm text-gray-300 font-medium">
+              <CheckCircle className="w-4 h-4 mr-2 text-emerald-500" />
               Free to join • No hidden fees • Cancel anytime
             </div>
           </div>
 
 
           {/* Trust indicators */}
-          <div className="mt-6 flex items-center justify-center gap-6 text-xs text-gray-500">
+          {/* <div className="mt-4 flex items-center justify-center gap-6 text-xs text-gray-400">
             <div className="flex items-center">
               <Shield className="w-3 h-3 mr-1 text-emerald-500" />
               <span>Secure</span>
@@ -446,10 +443,10 @@ const handleGoogleLogin = () => {
               <span>Fast</span>
             </div>
             <div className="flex items-center">
-              <Star className="w-3 h-3 mr-1 text-rose-500" />
+              <Star className="w-3 h-3 mr-1 text-emerald-500" />
               <span>Trusted</span>
             </div>
-          </div>
+          </div>  */}
         </CardContent>
       </Card>
     </motion.div>
