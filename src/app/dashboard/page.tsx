@@ -127,7 +127,7 @@ const TabButton = ({ active, onClick, icon: Icon, label, count, gradient }: TabB
     onClick={onClick}
     className={`relative flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 ${active
         ? `bg-gradient-to-r ${gradient} text-white shadow-xl scale-105`
-        : 'bg-white/80 backdrop-blur-lg text-gray-700 hover:bg-white hover:shadow-lg'
+        : 'bg-gray-800/50 backdrop-blur-lg text-gray-300 hover:bg-gray-700/50 hover:shadow-lg'
       }`}
     whileHover={{ scale: active ? 1.05 : 1.02 }}
     whileTap={{ scale: 0.98 }}
@@ -136,7 +136,7 @@ const TabButton = ({ active, onClick, icon: Icon, label, count, gradient }: TabB
       <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-white'}`} />
     </div>
     <span>{label}</span>
-    <div className={`px-3 py-1 rounded-full text-sm font-bold ${active ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'
+    <div className={`px-3 py-1 rounded-full text-sm font-bold ${active ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-300'
       }`}>
       {count}
     </div>
@@ -167,7 +167,7 @@ const StatCard = ({ icon: Icon, title, value, subtitle, gradient }: StatCardProp
     transition={{ duration: 0.3 }}
     className="group"
   >
-    <Card className="relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-white/95 backdrop-blur-lg">
+    <Card className="relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gray-900/95 backdrop-blur-lg border border-gray-800">
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-5`} />
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-10 group-hover:opacity-15 transition-opacity duration-300`} />
       <CardContent className="relative p-6">
@@ -177,9 +177,9 @@ const StatCard = ({ icon: Icon, title, value, subtitle, gradient }: StatCardProp
           </div>
         </div>
         <div className="space-y-1">
-          <h3 className="text-2xl font-bold text-gray-900">{title.includes('Spent') || title.includes('Price') ? `₹${value.toLocaleString('en-IN')}` : value}</h3>
-          <p className="text-gray-700 font-medium">{title}</p>
-          {subtitle && <p className="text-gray-500 text-sm">{subtitle}</p>}
+          <h3 className="text-2xl font-bold text-white">{title.includes('Spent') || title.includes('Price') ? `₹${value.toLocaleString('en-IN')}` : value}</h3>
+          <p className="text-gray-300 font-medium">{title}</p>
+          {subtitle && <p className="text-gray-400 text-sm">{subtitle}</p>}
         </div>
         <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${gradient}`} />
       </CardContent>
@@ -297,7 +297,7 @@ const AuctionCard = ({ auction, isUpcoming = false }: AuctionCardProps) => {
       transition={{ duration: 0.3 }}
       className="group"
     >
-      <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 bg-white/95 backdrop-blur-lg">
+      <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 bg-gray-900/95 backdrop-blur-lg border border-gray-800">
         <div className="relative">
           <img
             src={auction.Image || "/auction-placeholder.svg"}
@@ -336,18 +336,18 @@ const AuctionCard = ({ auction, isUpcoming = false }: AuctionCardProps) => {
 
         <CardContent className="p-6">
           <div className="mb-4">
-            <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{auction.Title || 'Untitled Auction'}</h3>
-            <p className="text-gray-600 text-sm line-clamp-2">{auction.Description || 'No description available'}</p>
+            <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{auction.Title || 'Untitled Auction'}</h3>
+            <p className="text-gray-300 text-sm line-clamp-2">{auction.Description || 'No description available'}</p>
           </div>
 
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm text-gray-500">Current Price</p>
-              <p className="text-2xl font-bold text-gray-900">₹{Number(auction.CurrentPrice || auction.StartingPrice || 0).toLocaleString('en-IN')}</p>
+              <p className="text-sm text-gray-400">Current Price</p>
+              <p className="text-2xl font-bold text-white">₹{Number(auction.CurrentPrice || auction.StartingPrice || 0).toLocaleString('en-IN')}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-500">{getTimeDisplay()}</p>
-              <div className="flex items-center gap-1 text-gray-600">
+              <p className="text-sm text-gray-400">{getTimeDisplay()}</p>
+              <div className="flex items-center gap-1 text-gray-300">
                 <Eye className="w-4 h-4" />
                 <span className="text-sm">{auction.ClientCount || 0}</span>
               </div>
@@ -358,7 +358,7 @@ const AuctionCard = ({ auction, isUpcoming = false }: AuctionCardProps) => {
           {getWinnerDisplay()}
 
           <div className="flex items-center gap-3 mt-4">
-            <Button asChild className="flex-1 bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700">
+            <Button asChild className="flex-1 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700">
               <Link href={`/auction/${auction.ID}`}>
                 View Details
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -622,28 +622,28 @@ export default function DashboardPage() {
       title: "Total Auctions",
       value: userStats?.data?.auctions_created || 0,
       subtitle: "Created by you",
-      gradient: "from-rose-500 to-pink-600"
+      gradient: "from-emerald-500 to-green-600"
     },
     {
       icon: Trophy,
       title: "Auctions Won",
       value: userStats?.data?.won_auctions || 0,
       subtitle: "Victory count",
-      gradient: "from-amber-500 to-orange-600"
+      gradient: "from-amber-500 to-yellow-600"
     },
     {
       icon: TrendingUp,
       title: "Total Bids",
       value: userStats?.data?.total_bids || 0,
       subtitle: "All time",
-      gradient: "from-violet-500 to-purple-600"
+      gradient: "from-teal-500 to-cyan-600"
     },
     {
       icon: DollarSign,
       title: "Total Spent",
       value: `${userStats?.data?.total_amount_bid?.toLocaleString() || '0'}`,
       subtitle: "In auctions",
-      gradient: "from-emerald-500 to-teal-600"
+      gradient: "from-green-500 to-emerald-600"
     }
   ];
 
@@ -677,22 +677,22 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-500 via-pink-600 to-purple-700 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 relative overflow-hidden">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-black/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/5 via-transparent to-amber-900/5"></div>
       <div className="absolute inset-0 opacity-20">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, rgba(255,255,255,0.15) 2px, transparent 2px)`,
-            backgroundSize: "60px 60px",
+            backgroundImage: `radial-gradient(circle at 25% 25%, rgba(34, 197, 94, 0.03) 1px, transparent 1px)`,
+            backgroundSize: "50px 50px",
           }}
         ></div>
       </div>
 
       {/* Floating orbs */}
-      <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-violet-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+      <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-full blur-3xl"></div>
 
       <div className="relative container mx-auto px-4 py-8">
         {/* Header */}
@@ -705,11 +705,11 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">
                 Welcome back,
-                <span className="block bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400 bg-clip-text text-transparent">
                   {user.user_name || user.userName}!
                 </span>
               </h1>
-              <p className="text-rose-100 text-lg">
+              <p className="text-emerald-100 text-lg">
                 Manage your auctions and track your bidding activity
               </p>
             </div>
@@ -740,7 +740,7 @@ export default function DashboardPage() {
           </div>
           
           {/* Last Refresh Time */}
-          <div className="text-rose-100/80 text-sm">
+          <div className="text-emerald-100/80 text-sm">
             Last updated: {lastRefresh.toLocaleTimeString()}
           </div>
         </motion.div>
@@ -771,7 +771,7 @@ export default function DashboardPage() {
           transition={{ delay: 0.4 }}
           className="mb-8"
         >
-          <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
+          <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden border border-gray-800">
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
                 <div className="flex gap-4">
@@ -781,7 +781,7 @@ export default function DashboardPage() {
                     icon={Flame}
                     label="Active"
                     count={activeAuctions.length}
-                    gradient="from-green-500 to-emerald-600"
+                    gradient="from-emerald-500 to-green-600"
                   />
                   <TabButton
                     active={activeTab === 'upcoming'}
@@ -789,7 +789,7 @@ export default function DashboardPage() {
                     icon={Timer}
                     label="Upcoming"
                     count={upcomingAuctions.length}
-                    gradient="from-blue-500 to-cyan-600"
+                    gradient="from-amber-500 to-yellow-600"
                   />
                   <TabButton
                     active={activeTab === 'past'}
@@ -797,7 +797,7 @@ export default function DashboardPage() {
                     icon={History}
                     label="Past"
                     count={pastAuctions.length}
-                    gradient="from-purple-500 to-pink-600"
+                    gradient="from-teal-500 to-cyan-600"
                   />
                 </div>
 
@@ -808,10 +808,10 @@ export default function DashboardPage() {
                       placeholder="Search auctions..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 w-64 border-2 focus:border-rose-500 rounded-xl"
+                      className="pl-10 w-64 border-2 focus:border-emerald-500 rounded-xl bg-gray-800 border-gray-700 text-white"
                     />
                   </div>
-                  <div className="flex rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="flex rounded-xl border border-gray-700 overflow-hidden">
                     <Button
                       variant={viewMode === 'grid' ? 'default' : 'ghost'}
                       size="sm"
@@ -865,10 +865,10 @@ export default function DashboardPage() {
                       <div className="text-6xl mb-4">
                         {activeTab === 'active' ? '🔥' : activeTab === 'upcoming' ? '⏰' : '📚'}
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      <h3 className="text-2xl font-bold text-white mb-2">
                         No {activeTab} auctions
                       </h3>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-gray-400 mb-6">
                         {activeTab === 'active'
                           ? "No active auctions available right now. Check back later or create your own!"
                           : activeTab === 'upcoming'
@@ -877,7 +877,7 @@ export default function DashboardPage() {
                         }
                       </p>
                       {(activeTab === 'upcoming' || activeTab === 'active') && (
-                        <Button asChild className="bg-gradient-to-r from-rose-500 to-purple-600">
+                        <Button asChild className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700">
                           <Link href="/create-auction">
                             <Plus className="w-4 h-4 mr-2" />
                             Create Your First Auction
@@ -897,17 +897,17 @@ export default function DashboardPage() {
       <motion.div
         animate={{ y: [-10, 10, -10] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 right-20 w-20 h-20 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center shadow-2xl"
+        className="absolute top-20 right-20 w-20 h-20 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl"
       >
-        <Sparkles className="w-10 h-10 text-amber-800" />
+        <Sparkles className="w-10 h-10 text-white" />
       </motion.div>
 
       <motion.div
         animate={{ y: [10, -10, 10] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-20 left-20 w-16 h-16 bg-gradient-to-r from-violet-400 to-purple-400 rounded-full flex items-center justify-center shadow-2xl"
+        className="absolute bottom-20 left-20 w-16 h-16 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-2xl"
       >
-        <Zap className="w-8 h-8 text-violet-800" />
+        <Zap className="w-8 h-8 text-white" />
       </motion.div>
 
       {/* Graffiti Congratulations Modal */}

@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${inter.className} bg-gray-50 dark:bg-gray-900 min-h-screen`} suppressHydrationWarning={true}>
+      <body className={`${inter.className} min-h-screen`} suppressHydrationWarning={true}>
         <Providers>
           <Navbar />
           <main className="min-h-screen">

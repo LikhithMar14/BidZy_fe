@@ -78,7 +78,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-purple-900 to-pink-900 text-white relative overflow-hidden">
+    <footer className="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <svg className="w-full h-full" viewBox="0 0 100 100" fill="none">
@@ -109,7 +109,7 @@ const Footer = () => {
           return (
             <motion.div
               key={i}
-              className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full"
+              className="absolute w-2 h-2 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full"
               style={{
                 left: `${positions[i].left}%`,
                 top: `${positions[i].top}%`,
@@ -142,11 +142,11 @@ const Footer = () => {
             >
               <div className="flex items-center space-x-4 mb-6">
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 rounded-3xl flex items-center justify-center shadow-2xl">
                     <Gavel className="h-9 w-9 text-white" />
                   </div>
                   <motion.div
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center"
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full flex items-center justify-center"
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
@@ -154,7 +154,7 @@ const Footer = () => {
                   </motion.div>
                 </div>
                 <div>
-                  <h2 className="text-4xl font-black bg-gradient-to-r from-white via-pink-200 to-purple-200 bg-clip-text text-transparent">
+                  <h2 className="text-4xl font-black bg-gradient-to-r from-white via-emerald-200 to-green-200 bg-clip-text text-transparent">
                     BidZy
                   </h2>
                   <p className="text-gray-300 font-medium">Premium Auctions Platform</p>
@@ -176,7 +176,7 @@ const Footer = () => {
                     viewport={{ once: true }}
                     className="flex items-center space-x-3 p-3 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10"
                   >
-                    <feature.icon className="h-5 w-5 text-pink-400" />
+                    <feature.icon className="h-5 w-5 text-emerald-400" />
                     <span className="text-sm font-medium text-gray-200">{feature.text}</span>
                   </motion.div>
                 ))}
@@ -200,12 +200,12 @@ const Footer = () => {
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     Subscribe
                   </motion.button>
@@ -235,7 +235,7 @@ const Footer = () => {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-gray-300 hover:text-pink-400 transition-colors duration-200 text-sm font-medium"
+                        className="text-gray-300 hover:text-emerald-400 transition-colors duration-200 text-sm font-medium"
                       >
                         {link.label}
                       </Link>
@@ -257,8 +257,8 @@ const Footer = () => {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left"
           >
             <div className="flex items-center justify-center md:justify-start space-x-3">
-              <div className="p-2 bg-pink-500/20 rounded-lg">
-                <Mail className="h-5 w-5 text-pink-400" />
+              <div className="p-2 bg-emerald-500/20 rounded-lg">
+                <Mail className="h-5 w-5 text-emerald-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-400">Email us</p>
@@ -266,8 +266,8 @@ const Footer = () => {
               </div>
             </div>
             <div className="flex items-center justify-center md:justify-start space-x-3">
-              <div className="p-2 bg-purple-500/20 rounded-lg">
-                <Phone className="h-5 w-5 text-purple-400" />
+              <div className="p-2 bg-green-500/20 rounded-lg">
+                <Phone className="h-5 w-5 text-green-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-400">Call us</p>
@@ -275,8 +275,8 @@ const Footer = () => {
               </div>
             </div>
             <div className="flex items-center justify-center md:justify-start space-x-3">
-              <div className="p-2 bg-rose-500/20 rounded-lg">
-                <MapPin className="h-5 w-5 text-rose-400" />
+              <div className="p-2 bg-teal-500/20 rounded-lg">
+                <MapPin className="h-5 w-5 text-teal-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-400">Visit us</p>
@@ -298,7 +298,7 @@ const Footer = () => {
               className="flex items-center space-x-2 text-gray-400"
             >
               <span>© {currentYear} BidZy. Made with</span>
-              <Heart className="h-4 w-4 text-pink-500 fill-current" />
+              <Heart className="h-4 w-4 text-emerald-500 fill-current" />
               <span>for auction enthusiasts.</span>
             </motion.div>
 

@@ -846,22 +846,22 @@ export default function AuctionPage() {
   );
 
   return (
-          <div className="min-h-screen bg-gradient-to-br from-rose-500 via-pink-600 to-purple-700 relative overflow-hidden">
+          <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 relative overflow-hidden">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-black/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/5 via-transparent to-amber-900/5"></div>
       <div className="absolute inset-0 opacity-20">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, rgba(255,255,255,0.15) 2px, transparent 2px)`,
-            backgroundSize: "60px 60px",
+            backgroundImage: `radial-gradient(circle at 25% 25%, rgba(34, 197, 94, 0.03) 1px, transparent 1px)`,
+            backgroundSize: "50px 50px",
           }}
         ></div>
       </div>
 
       {/* Floating orbs */}
-      <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-violet-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+      <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-full blur-3xl"></div>
 
       <div className="relative container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-7xl">
         {/* Header */}
@@ -886,7 +886,7 @@ export default function AuctionPage() {
           transition={{ delay: 0.1 }}
           className="mb-4 sm:mb-6"
         >
-          <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
+          <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden border border-gray-800">
             <div className="flex items-center justify-around">
               <TabButton
                 active={activeTab === 'overview'}
@@ -931,7 +931,7 @@ export default function AuctionPage() {
                       transition={{ duration: 0.6 }}
                       className="relative group"
                     >
-                      <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-lg rounded-3xl overflow-hidden h-full">
+                      <Card className="border-0 shadow-2xl bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-lg rounded-3xl overflow-hidden h-full border border-gray-700">
                         {/* 🎯 Arena Header */}
                         <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-r from-black/20 to-transparent">
                           <div className="flex items-center justify-between">
@@ -958,7 +958,7 @@ export default function AuctionPage() {
                                     boxShadow: ["0 0 0 rgba(34, 197, 94, 0.4)", "0 0 20px rgba(34, 197, 94, 0.8)", "0 0 0 rgba(34, 197, 94, 0.4)"]
                                   }}
                                   transition={{ duration: 2, repeat: Infinity }}
-                                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-white/20"
+                                  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-white/20"
                                 >
                                   <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
                                   <span className="text-lg">⚡ LIVE BATTLE</span>
@@ -968,7 +968,7 @@ export default function AuctionPage() {
                                 <motion.div
                                   animate={{ scale: [1, 1.05, 1] }}
                                   transition={{ duration: 2, repeat: Infinity }}
-                                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-white/20"
+                                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-600 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-white/20"
                                 >
                                   <Clock className="w-4 h-4" />
                                   <span>🚀 PREPARING ARENA</span>
@@ -984,8 +984,8 @@ export default function AuctionPage() {
                         </div>
 
                         {/* 🎮 Main Arena Display */}
-                        <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 flex-1 flex items-center justify-center min-h-[400px] max-h-[500px] overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5"></div>
+                        <div className="relative bg-gradient-to-br from-gray-800 to-gray-700 flex-1 flex items-center justify-center min-h-[400px] max-h-[500px] overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-amber-500/5"></div>
                           <img
                             src={auction.Image || "/auction-placeholder.svg"}
                             alt={auction.Title}
@@ -995,13 +995,13 @@ export default function AuctionPage() {
                           
                           {/* 🎯 Floating Stats */}
                           <div className="absolute bottom-4 left-4 right-4 z-20">
-                            <div className="flex items-center justify-between bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
+                            <div className="flex items-center justify-between bg-gray-900/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-gray-700/50">
                               <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-1 text-gray-700">
+                                <div className="flex items-center gap-1 text-gray-300">
                                   <User className="w-4 h-4" />
                                   <span className="font-semibold">By {auction.user.user_name}</span>
                                 </div>
-                                <div className="flex items-center gap-1 text-gray-700">
+                                <div className="flex items-center gap-1 text-gray-300">
                                   <Eye className="w-4 h-4" />
                                   <span className="font-semibold">{currentParticipants} watching</span>
                                 </div>
@@ -1011,26 +1011,26 @@ export default function AuctionPage() {
                                   <motion.div
                                     animate={{ scale: [1, 1.1, 1] }}
                                     transition={{ duration: 1.5, repeat: Infinity }}
-                                    className="flex items-center gap-1 text-green-600 font-bold"
+                                    className="flex items-center gap-1 text-green-400 font-bold"
                                   >
                                     <Wifi className="w-4 h-4" />
                                     <span>⚡ LIVE</span>
                                   </motion.div>
                                 )}
                                 {connectionStatus === 'connecting' && (
-                                  <div className="flex items-center gap-1 text-blue-600">
+                                  <div className="flex items-center gap-1 text-amber-400">
                                     <Activity className="w-4 h-4 animate-pulse" />
                                     <span>Connecting...</span>
                                   </div>
                                 )}
                                 {connectionStatus === 'error' && (
-                                  <div className="flex items-center gap-1 text-orange-600">
+                                  <div className="flex items-center gap-1 text-orange-400">
                                     <WifiOff className="w-4 h-4" />
                                     <span>Limited</span>
                                   </div>
                                 )}
                                 {connectionStatus === 'disconnected' && user && (
-                                  <div className="flex items-center gap-1 text-gray-600">
+                                  <div className="flex items-center gap-1 text-gray-400">
                                     <WifiOff className="w-4 h-4" />
                                     <span>Offline</span>
                                   </div>
@@ -1041,16 +1041,16 @@ export default function AuctionPage() {
                         </div>
 
                         {/* 🎮 Item Info Panel */}
-                        <CardContent className="p-6 bg-gradient-to-r from-white to-gray-50">
+                        <CardContent className="p-6 bg-gradient-to-r from-gray-900 to-gray-800">
                           <motion.h1 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3"
+                            className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-3"
                           >
                             {auction.Title}
                           </motion.h1>
                           <div className="prose max-w-none">
-                            <p className="text-gray-700 leading-relaxed text-lg line-clamp-3">{auction.Description}</p>
+                            <p className="text-gray-300 leading-relaxed text-lg line-clamp-3">{auction.Description}</p>
                           </div>
                         </CardContent>
                       </Card>
@@ -1065,7 +1065,7 @@ export default function AuctionPage() {
                       transition={{ duration: 0.6, delay: 0.2 }}
                       className="h-full"
                     >
-                      <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-lg rounded-3xl overflow-hidden h-full">
+                      <Card className="border-0 shadow-2xl bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-lg rounded-3xl overflow-hidden h-full border border-gray-700">
                         <CardContent className="p-6 flex flex-col gap-6 h-full">
                           {/* ⏰ BATTLE TIMER */}
                           <div className="text-center">
@@ -1079,28 +1079,28 @@ export default function AuctionPage() {
                           </div>
 
                           {/* 🏆 CURRENT CHAMPION */}
-                          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 text-center">
+                          <div className="bg-gradient-to-br from-amber-900/30 to-yellow-900/30 border-2 border-amber-500/30 rounded-2xl p-6 text-center">
                             <div className="flex items-center justify-center gap-2 mb-3">
-                              <Crown className="w-6 h-6 text-amber-600" />
-                              <span className="text-lg font-bold text-amber-800">CURRENT CHAMPION</span>
+                              <Crown className="w-6 h-6 text-amber-400" />
+                              <span className="text-lg font-bold text-amber-300">CURRENT CHAMPION</span>
                             </div>
                             <motion.div
                               key={currentPrice}
                               initial={{ scale: 1.2, color: '#10b981' }}
-                              animate={{ scale: 1, color: '#111827' }}
+                              animate={{ scale: 1, color: '#f3f4f6' }}
                               transition={{ duration: 0.8, type: "spring" }}
-                              className="text-4xl font-bold text-gray-900 mb-3"
+                              className="text-4xl font-bold text-white mb-3"
                             >
                               ₹{currentPrice.toLocaleString('en-IN')}
                             </motion.div>
                             {currentHighestBidder && (
-                              <div className="flex items-center justify-center gap-2 text-gray-700">
+                              <div className="flex items-center justify-center gap-2 text-gray-300">
                                 <span className="text-lg font-semibold">👑 {currentHighestBidder}</span>
                                 {connectionStatus === 'connected' && (
                                   <motion.div
                                     animate={{ scale: [1, 1.2, 1] }}
                                     transition={{ duration: 1, repeat: Infinity }}
-                                    className="w-3 h-3 bg-green-500 rounded-full"
+                                    className="w-3 h-3 bg-emerald-500 rounded-full"
                                   ></motion.div>
                                 )}
                               </div>
@@ -1111,7 +1111,7 @@ export default function AuctionPage() {
                             <div className="space-y-4">
                               {/* 🎯 Quick Attack Buttons */}
                               <div className="text-center mb-4">
-                                <h3 className="text-lg font-bold text-gray-800 mb-3">⚔️ QUICK ATTACKS</h3>
+                                <h3 className="text-lg font-bold text-white mb-3">⚔️ QUICK ATTACKS</h3>
                                 <div className="grid grid-cols-3 gap-2">
                                   {quickBidAmounts.map((amount, index) => (
                                     <motion.div
@@ -1123,7 +1123,7 @@ export default function AuctionPage() {
                                         variant="outline"
                                         size="sm"
                                         onClick={() => handleQuickBid(amount)}
-                                        className="w-full h-12 text-sm font-bold bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 hover:from-blue-100 hover:to-cyan-100 hover:border-blue-300"
+                                        className="w-full h-12 text-sm font-bold bg-gradient-to-r from-emerald-900/30 to-green-900/30 border-2 border-emerald-500/30 hover:from-emerald-800/40 hover:to-green-800/40 hover:border-emerald-400/40 text-emerald-300"
                                       >
                                         +₹{amount.toLocaleString('en-IN')}
                                       </Button>
@@ -1134,14 +1134,14 @@ export default function AuctionPage() {
 
                               {/* 🎮 Custom Attack Input */}
                               <div className="text-center">
-                                <h3 className="text-lg font-bold text-gray-800 mb-3">🎯 CUSTOM STRIKE</h3>
+                                <h3 className="text-lg font-bold text-white mb-3">🎯 CUSTOM STRIKE</h3>
                                 <div className="flex gap-2">
                                   <Input
                                     type="number"
                                     placeholder="Enter your bid amount"
                                     value={bidAmount}
                                     onChange={(e) => setBidAmount(e.target.value)}
-                                    className="h-12 text-base border-2 border-purple-200 focus:border-purple-500 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50"
+                                    className="h-12 text-base border-2 border-emerald-500/30 focus:border-emerald-400 rounded-xl bg-gradient-to-r from-emerald-900/20 to-green-900/20 text-white placeholder-gray-400"
                                     step="0.01"
                                     min={auction.CurrentPrice + auction.Increment}
                                   />
@@ -1152,17 +1152,17 @@ export default function AuctionPage() {
                                     <Button
                                       onClick={handlePlaceBid}
                                       disabled={!bidAmount || connectionStatus !== 'connected'}
-                                      className="h-12 px-6 bg-gradient-to-r from-rose-500 via-pink-600 to-purple-700 hover:from-rose-600 hover:via-pink-700 hover:to-purple-800 text-white font-bold shadow-lg"
+                                      className="h-12 px-6 bg-gradient-to-r from-emerald-500 via-green-600 to-teal-700 hover:from-emerald-600 hover:via-green-700 hover:to-teal-800 text-white font-bold shadow-lg"
                                     >
                                       <Gavel className="w-5 h-5 mr-2" />
                                       STRIKE!
                                     </Button>
                                   </motion.div>
                                 </div>
-                                <p className="text-xs text-gray-600 mt-2">
+                                <p className="text-xs text-gray-400 mt-2">
                                   Min: ₹{(currentPrice + currentIncrement).toLocaleString('en-IN')}
                                   {connectionStatus === 'connected' && (
-                                    <span className="text-green-600 ml-2 font-medium">⚡ LIVE</span>
+                                    <span className="text-emerald-400 ml-2 font-medium">⚡ LIVE</span>
                                   )}
                                 </p>
                               </div>
@@ -1175,7 +1175,7 @@ export default function AuctionPage() {
                               whileHover={{ scale: 1.02 }}
                               className="text-center"
                             >
-                              <Button asChild className="w-full h-14 text-lg bg-gradient-to-r from-rose-500 via-pink-600 to-purple-700 hover:from-rose-600 hover:via-pink-700 hover:to-purple-800 font-bold shadow-lg">
+                              <Button asChild className="w-full h-14 text-lg bg-gradient-to-r from-emerald-500 via-green-600 to-teal-700 hover:from-emerald-600 hover:via-green-700 hover:to-teal-800 font-bold shadow-lg">
                                 <Link href="/auth/login">🚪 ENTER THE ARENA</Link>
                               </Button>
                             </motion.div>
@@ -1186,11 +1186,11 @@ export default function AuctionPage() {
                             <motion.div
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="text-center p-6 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-2xl"
+                              className="text-center p-6 bg-gradient-to-r from-amber-900/30 to-yellow-900/30 border-2 border-amber-500/30 rounded-2xl"
                             >
-                              <Clock className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                              <h3 className="text-xl font-bold text-gray-900 mb-2">⏳ WAITING ROOM</h3>
-                              <p className="text-sm text-gray-600">
+                              <Clock className="w-12 h-12 text-amber-400 mx-auto mb-3" />
+                              <h3 className="text-xl font-bold text-white mb-2">⏳ WAITING ROOM</h3>
+                              <p className="text-sm text-gray-300">
                                 Battle begins on {new Date(auction.StartDate).toLocaleDateString()}
                               </p>
                             </motion.div>
@@ -1201,16 +1201,16 @@ export default function AuctionPage() {
                             <motion.div
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="mt-4 p-4 bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl"
+                              className="mt-4 p-4 bg-gradient-to-r from-orange-900/30 to-red-900/30 border-2 border-orange-500/30 rounded-2xl"
                             >
                               <div className="text-center">
-                                <WifiOff className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-                                <p className="text-sm text-orange-700 mb-3 font-semibold">Connection Issues</p>
+                                <WifiOff className="w-8 h-8 text-orange-400 mx-auto mb-2" />
+                                <p className="text-sm text-orange-300 mb-3 font-semibold">Connection Issues</p>
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   onClick={handleReconnect}
-                                  className="bg-white hover:bg-orange-50 border-orange-300 text-orange-700 font-semibold"
+                                  className="bg-gray-800/50 hover:bg-orange-900/20 border-orange-500/30 text-orange-300 font-semibold"
                                 >
                                   <Wifi className="w-4 h-4 mr-1" />
                                   Reconnect
@@ -1224,10 +1224,10 @@ export default function AuctionPage() {
                             <motion.div
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="text-center p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-200 rounded-2xl"
+                              className="text-center p-6 bg-gradient-to-r from-gray-800/50 to-gray-700/50 border-2 border-gray-600/50 rounded-2xl"
                             >
-                              <Trophy className="w-12 h-12 text-amber-600 mx-auto mb-3" />
-                              <h3 className="text-xl font-bold text-gray-900 mb-2">🏁 BATTLE RESULTS</h3>
+                              <Trophy className="w-12 h-12 text-amber-400 mx-auto mb-3" />
+                              <h3 className="text-xl font-bold text-white mb-2">🏁 BATTLE RESULTS</h3>
                               {(() => {
                                 const winnerName = auction.WinnerName || 
                                                   (auction as any).winnerName || 
@@ -1247,10 +1247,10 @@ export default function AuctionPage() {
                                   const highestBid = uniqueBids[0];
                                   return (
                                     <div>
-                                      <p className="text-lg font-semibold text-gray-700 mb-1">
-                                        👑 Champion: <span className="text-amber-600">{highestBid.bidderName}</span>
+                                      <p className="text-lg font-semibold text-gray-300 mb-1">
+                                        👑 Champion: <span className="text-amber-400">{highestBid.bidderName}</span>
                                       </p>
-                                      <p className="text-sm text-gray-600">
+                                      <p className="text-sm text-gray-400">
                                         Final Strike: ₹{highestBid.amount.toLocaleString('en-IN')}
                                       </p>
                                     </div>
@@ -1260,13 +1260,13 @@ export default function AuctionPage() {
                                 if (winnerName && winnerName.trim()) {
                                   const resolvedWinnerName = resolveWinnerName(winnerName);
                                   return (
-                                    <p className="text-lg font-semibold text-gray-700">
-                                      👑 Champion: <span className="text-amber-600">{resolvedWinnerName}</span>
+                                    <p className="text-lg font-semibold text-gray-300">
+                                      👑 Champion: <span className="text-amber-400">{resolvedWinnerName}</span>
                                     </p>
                                   );
                                 } else {
                                   return (
-                                    <p className="text-sm text-gray-600">No champion determined</p>
+                                    <p className="text-sm text-gray-400">No champion determined</p>
                                   );
                                 }
                               })()}
@@ -1285,20 +1285,20 @@ export default function AuctionPage() {
           <div hidden={activeTab !== 'overview'}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Recent Bids */}
-              <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden flex flex-col h-full">
+              <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden flex flex-col h-full border border-gray-800">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl">
+                    <div className="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl">
                       <Gavel className="w-6 h-6 text-white" />
                     </div>
-                    Recent Bids
+                    <span className="text-white">Recent Bids</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-3 sm:p-4 md:p-6 flex-1">
                   {connectionStatus === 'connected' && (
-                    <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
-                      <div className="flex items-center gap-2 text-green-700">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <div className="mb-4 p-3 bg-gradient-to-r from-emerald-900/30 to-green-900/30 border border-emerald-500/30 rounded-xl">
+                      <div className="flex items-center gap-2 text-emerald-300">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                         <LiveIcon className="w-4 h-4" />
                         <span className="text-sm font-medium">Real-time bidding active</span>
                       </div>
@@ -1320,40 +1320,40 @@ export default function AuctionPage() {
                               damping: 30
                             }}
                             className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
-                              index === 0 ? 'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-md' : 
-                              (bid as any).isRealtime ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' : 'bg-gray-50'
+                              index === 0 ? 'bg-gradient-to-r from-amber-900/30 to-yellow-900/30 border border-amber-500/30 shadow-md' : 
+                              (bid as any).isRealtime ? 'bg-gradient-to-r from-emerald-900/30 to-green-900/30 border border-emerald-500/30' : 'bg-gray-800/50'
                             }`}
                           >
                             <div className="flex items-center gap-3">
                               {index === 0 && (
-                                <Crown className="w-5 h-5 text-amber-600" />
+                                <Crown className="w-5 h-5 text-amber-400" />
                               )}
                               {(bid as any).isRealtime && index !== 0 && (
-                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                               )}
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <span className="font-semibold">{bid.bidderName}</span>
+                                  <span className="font-semibold text-white">{bid.bidderName}</span>
                                   {(bid as any).isRealtime && (
-                                    <Badge className="bg-green-100 text-green-700 text-xs px-2 py-0.5">
+                                    <Badge className="bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 border border-emerald-500/30">
                                       LIVE
                                     </Badge>
                                   )}
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-gray-400">
                                   {bid.createdAt ? new Date(bid.createdAt as string).toLocaleString() : 'Just now'}
                                 </div>
                               </div>
                             </div>
-                            <div className={`font-bold text-lg ${index === 0 ? 'text-amber-700' : 'text-gray-900'}`}>
+                            <div className={`font-bold text-lg ${index === 0 ? 'text-amber-400' : 'text-white'}`}>
                               ₹{bid.amount.toLocaleString('en-IN')}
                             </div>
                           </motion.div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-gray-600">
-                        <Gavel className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                      <div className="text-center py-8 text-gray-400">
+                        <Gavel className="w-12 h-12 mx-auto mb-3 text-gray-500" />
                         <p>No bids yet. Be the first to bid!</p>
                       </div>
                     )}
@@ -1361,40 +1361,40 @@ export default function AuctionPage() {
                 </CardContent>
               </Card>
               {/* Auction Details */}
-              <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden flex flex-col h-full">
+              <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden flex flex-col h-full border border-gray-800">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl">
+                    <div className="p-2 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl">
                       <Star className="w-5 h-5 text-white" />
                     </div>
-                    Auction Details
+                    <span className="text-white">Auction Details</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6 flex-1 flex flex-col justify-between">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Total Bids</span>
-                      <span className="font-semibold">{Array.isArray(uniqueBids) ? uniqueBids.length : 0}</span>
+                      <span className="text-gray-400">Total Bids</span>
+                      <span className="font-semibold text-white">{Array.isArray(uniqueBids) ? uniqueBids.length : 0}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Watching</span>
+                      <span className="text-gray-400">Watching</span>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold">{currentParticipants}</span>
+                        <span className="font-semibold text-white">{currentParticipants}</span>
                         {connectionStatus === 'connected' && (
-                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                         )}
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Participants</span>
-                      <span className="font-semibold">{(auction.participants || []).length}</span>
+                      <span className="text-gray-400">Participants</span>
+                      <span className="font-semibold text-white">{(auction.participants || []).length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Status</span>
+                      <span className="text-gray-400">Status</span>
                       <span className={`font-semibold ${
-                        isAuctionActive ? 'text-green-600' : 
-                        isAuctionNotStarted ? 'text-blue-600' :
-                        isAuctionEnded ? 'text-red-600' : 'text-gray-600'
+                        isAuctionActive ? 'text-emerald-400' : 
+                        isAuctionNotStarted ? 'text-amber-400' :
+                        isAuctionEnded ? 'text-red-400' : 'text-gray-400'
                       }`}>
                         {isAuctionNotStarted ? 'NOT STARTED' : 
                          isAuctionActive ? 'ACTIVE' : 
@@ -1402,26 +1402,26 @@ export default function AuctionPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="pt-4 border-t border-gray-200 space-y-4">
-                    <div className="bg-gray-50 rounded-xl p-4 text-center">
-                      <DollarSign className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-                      <div className="text-sm text-gray-600">Starting Price</div>
-                      <div className="font-bold text-lg">₹{auction.StartingPrice.toLocaleString('en-IN')}</div>
+                  <div className="pt-4 border-t border-gray-700 space-y-4">
+                    <div className="bg-gray-800/50 rounded-xl p-4 text-center">
+                      <DollarSign className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                      <div className="text-sm text-gray-400">Starting Price</div>
+                      <div className="font-bold text-lg text-white">₹{auction.StartingPrice.toLocaleString('en-IN')}</div>
                     </div>
-                    <div className="bg-gray-50 rounded-xl p-4 text-center">
-                      <TrendingUp className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-                      <div className="text-sm text-gray-600">Increment</div>
-                      <div className="font-bold text-lg">₹{auction.Increment.toLocaleString('en-IN')}</div>
+                    <div className="bg-gray-800/50 rounded-xl p-4 text-center">
+                      <TrendingUp className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                      <div className="text-sm text-gray-400">Increment</div>
+                      <div className="font-bold text-lg text-white">₹{auction.Increment.toLocaleString('en-IN')}</div>
                     </div>
-                    <div className="bg-gray-50 rounded-xl p-4 text-center">
-                      <Calendar className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-                      <div className="text-sm text-gray-600">Started</div>
-                      <div className="font-bold text-sm">{new Date(auction.StartDate).toLocaleDateString()}</div>
+                    <div className="bg-gray-800/50 rounded-xl p-4 text-center">
+                      <Calendar className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                      <div className="text-sm text-gray-400">Started</div>
+                      <div className="font-bold text-sm text-white">{new Date(auction.StartDate).toLocaleDateString()}</div>
                     </div>
                   </div>
-                  <div className="pt-4 border-t border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                  <div className="pt-4 border-t border-gray-700">
+                    <h4 className="font-semibold text-white mb-2">Description</h4>
+                    <p className="text-sm text-gray-300 leading-relaxed">
                       {auction.Description}
                     </p>
                   </div>
@@ -1492,17 +1492,17 @@ export default function AuctionPage() {
       <motion.div
         animate={{ y: [-10, 10, -10] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 right-20 w-20 h-20 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center shadow-2xl"
+        className="absolute top-20 right-20 w-20 h-20 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl"
       >
-        <Sparkles className="w-10 h-10 text-amber-800" />
+        <Sparkles className="w-10 h-10 text-white" />
       </motion.div>
 
       <motion.div
         animate={{ y: [10, -10, 10] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-20 left-20 w-16 h-16 bg-gradient-to-r from-violet-400 to-purple-400 rounded-full flex items-center justify-center shadow-2xl"
+        className="absolute bottom-20 left-20 w-16 h-16 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-2xl"
       >
-        <Zap className="w-8 h-8 text-violet-800" />
+        <Zap className="w-8 h-8 text-white" />
       </motion.div>
 
       {/* Graffiti Congratulations Modal */}

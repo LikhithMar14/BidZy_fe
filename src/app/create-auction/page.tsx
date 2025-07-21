@@ -229,22 +229,22 @@ export default function CreateAuctionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-500 via-pink-600 to-purple-700 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 relative overflow-hidden">
       {/* Enhanced background effects */}
-      <div className="absolute inset-0 bg-black/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/5 via-transparent to-amber-900/5"></div>
       <div className="absolute inset-0 opacity-20">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, rgba(255,255,255,0.15) 2px, transparent 2px)`,
-            backgroundSize: "60px 60px",
+            backgroundImage: `radial-gradient(circle at 25% 25%, rgba(34, 197, 94, 0.03) 1px, transparent 1px)`,
+            backgroundSize: "50px 50px",
           }}
         ></div>
       </div>
 
       {/* Floating gradient orbs */}
-      <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-violet-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+      <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-full blur-3xl"></div>
 
       <div className="relative container mx-auto px-4 py-8">
         <motion.div
@@ -283,11 +283,11 @@ export default function CreateAuctionPage() {
               <div>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
                   Create New
-                  <span className="block bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400 bg-clip-text text-transparent">
                     Auction
                   </span>
                 </h1>
-                <p className="text-rose-100 text-lg sm:text-xl mt-2">
+                <p className="text-emerald-100 text-lg sm:text-xl mt-2">
                   Share your treasures with bidders worldwide
                 </p>
               </div>
@@ -330,15 +330,15 @@ export default function CreateAuctionPage() {
                       whileHover={{ y: -2 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
-                        <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                      <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden border border-gray-800">
+                        <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700">
                           <CardTitle className="flex items-center gap-3 text-2xl">
-                            <div className="p-2 bg-gradient-to-r from-rose-500 to-pink-600 rounded-xl">
+                            <div className="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl">
                               <FileText className="w-6 h-6 text-white" />
                             </div>
-                            Basic Information
+                            <span className="text-white">Basic Information</span>
                           </CardTitle>
-                          <CardDescription className="text-base">
+                          <CardDescription className="text-base text-gray-300">
                             Provide the essential details about your auction item
                           </CardDescription>
                         </CardHeader>
@@ -348,15 +348,15 @@ export default function CreateAuctionPage() {
                             name="title"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-lg font-semibold text-gray-900">Auction Title</FormLabel>
+                                <FormLabel className="text-lg font-semibold text-white">Auction Title</FormLabel>
                                 <FormControl>
                                   <Input 
                                     placeholder="Enter a compelling title for your auction"
-                                    className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
+                                    className="h-12 text-base border-2 focus:border-emerald-500 rounded-xl bg-gray-800 border-gray-700 text-white placeholder-gray-400"
                                     {...field} 
                                   />
                                 </FormControl>
-                                <FormDescription className="text-base">
+                                <FormDescription className="text-base text-gray-400">
                                   Make it descriptive and appealing to potential bidders
                                 </FormDescription>
                                 <FormMessage />
@@ -369,15 +369,15 @@ export default function CreateAuctionPage() {
                             name="description"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-lg font-semibold text-gray-900">Description</FormLabel>
+                                <FormLabel className="text-lg font-semibold text-white">Description</FormLabel>
                                 <FormControl>
                                   <Textarea 
                                     placeholder="Describe your item in detail - condition, history, special features..."
-                                    className="min-h-[140px] text-base border-2 focus:border-rose-500 rounded-xl"
+                                    className="min-h-[140px] text-base border-2 focus:border-emerald-500 rounded-xl bg-gray-800 border-gray-700 text-white placeholder-gray-400"
                                     {...field} 
                                   />
                                 </FormControl>
-                                <FormDescription className="text-base">
+                                <FormDescription className="text-base text-gray-400">
                                   Include all relevant details that bidders should know
                                 </FormDescription>
                                 <FormMessage />
@@ -393,15 +393,15 @@ export default function CreateAuctionPage() {
                       whileHover={{ y: -2 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
-                        <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                      <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden border border-gray-800">
+                        <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700">
                           <CardTitle className="flex items-center gap-3 text-2xl">
-                            <div className="p-2 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl">
+                            <div className="p-2 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl">
                               <Tag className="w-6 h-6 text-white" />
                             </div>
-                            Categories
+                            <span className="text-white">Categories</span>
                           </CardTitle>
-                          <CardDescription className="text-base">
+                          <CardDescription className="text-base text-gray-300">
                             Select categories that best describe your item
                           </CardDescription>
                         </CardHeader>
@@ -415,7 +415,7 @@ export default function CreateAuctionPage() {
                                 className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
                                   selectedCategories.includes(category.id)
                                     ? `border-transparent shadow-xl bg-gradient-to-r ${category.gradient} text-white scale-105`
-                                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 bg-white'
+                                    : 'border-gray-600 hover:border-gray-500 hover:bg-gray-800/50 bg-gray-800/30'
                                 }`}
                                 whileHover={{ scale: selectedCategories.includes(category.id) ? 1.05 : 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -430,12 +430,12 @@ export default function CreateAuctionPage() {
                                   </motion.div>
                                 )}
                                 <div className="text-3xl mb-3">{category.icon}</div>
-                                <div className="font-semibold text-base">{category.name}</div>
+                                <div className={`font-semibold text-base ${selectedCategories.includes(category.id) ? 'text-white' : 'text-gray-300'}`}>{category.name}</div>
                               </motion.button>
                             ))}
                           </div>
                           {form.formState.errors.categoryIds && (
-                            <p className="text-red-500 text-sm mt-4 font-medium">
+                            <p className="text-red-400 text-sm mt-4 font-medium">
                               {form.formState.errors.categoryIds.message}
                             </p>
                           )}
@@ -448,15 +448,15 @@ export default function CreateAuctionPage() {
                       whileHover={{ y: -2 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
-                        <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                      <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden border border-gray-800">
+                        <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700">
                           <CardTitle className="flex items-center gap-3 text-2xl">
-                            <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl">
+                            <div className="p-2 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl">
                               <DollarSign className="w-6 h-6 text-white" />
                             </div>
-                            Pricing & Timing
+                            <span className="text-white">Pricing & Timing</span>
                           </CardTitle>
-                          <CardDescription className="text-base">
+                          <CardDescription className="text-base text-gray-300">
                             Set your auction parameters
                           </CardDescription>
                         </CardHeader>
@@ -467,14 +467,14 @@ export default function CreateAuctionPage() {
                               name="startingPrice"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">Starting Price (INR)</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-white">Starting Price (INR)</FormLabel>
                                   <FormControl>
                                     <Input 
                                       type="number"
                                       step="0.01"
                                       min="0.01"
                                       placeholder="0.00"
-                                      className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
+                                      className="h-12 text-base border-2 focus:border-emerald-500 rounded-xl bg-gray-800 border-gray-700 text-white placeholder-gray-400"
                                       {...field}
                                       onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                     />
@@ -489,14 +489,14 @@ export default function CreateAuctionPage() {
                               name="increment"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">Bid Increment (INR)</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-white">Bid Increment (INR)</FormLabel>
                                   <FormControl>
                                     <Input 
                                       type="number"
                                       step="0.01"
                                       min="0.01"
                                       placeholder="1.00"
-                                      className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
+                                      className="h-12 text-base border-2 focus:border-emerald-500 rounded-xl bg-gray-800 border-gray-700 text-white placeholder-gray-400"
                                       {...field}
                                       onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                     />
@@ -513,15 +513,15 @@ export default function CreateAuctionPage() {
                               name="startDateTime"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">Start Date & Time</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-white">Start Date & Time</FormLabel>
                                   <FormControl>
                                     <Input 
                                       type="datetime-local"
-                                      className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
+                                      className="h-12 text-base border-2 focus:border-emerald-500 rounded-xl bg-gray-800 border-gray-700 text-white"
                                       {...field}
                                     />
                                   </FormControl>
-                                  <FormDescription>
+                                  <FormDescription className="text-gray-400">
                                     When should the auction start?
                                   </FormDescription>
                                   <FormMessage />
@@ -534,15 +534,15 @@ export default function CreateAuctionPage() {
                               name="endDateTime"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-lg font-semibold text-gray-900">End Date & Time</FormLabel>
+                                  <FormLabel className="text-lg font-semibold text-white">End Date & Time</FormLabel>
                                   <FormControl>
                                     <Input 
                                       type="datetime-local"
-                                      className="h-12 text-base border-2 focus:border-rose-500 rounded-xl"
+                                      className="h-12 text-base border-2 focus:border-emerald-500 rounded-xl bg-gray-800 border-gray-700 text-white"
                                       {...field}
                                     />
                                   </FormControl>
-                                  <FormDescription>
+                                  <FormDescription className="text-gray-400">
                                     When should the auction end?
                                   </FormDescription>
                                   <FormMessage />
@@ -556,15 +556,15 @@ export default function CreateAuctionPage() {
                             <motion.div
                               initial={{ opacity: 0, scale: 0.95 }}
                               animate={{ opacity: 1, scale: 1 }}
-                              className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl"
+                              className="p-4 bg-gradient-to-r from-emerald-900/30 to-green-900/30 border border-emerald-500/30 rounded-xl"
                             >
                               <div className="flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-lg">
+                                <div className="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg">
                                   <Timer className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-900">Auction Duration</p>
-                                  <p className="text-blue-700 font-bold text-lg">{calculatedDuration}</p>
+                                  <p className="font-semibold text-white">Auction Duration</p>
+                                  <p className="text-emerald-300 font-bold text-lg">{calculatedDuration}</p>
                                 </div>
                               </div>
                             </motion.div>
@@ -581,15 +581,15 @@ export default function CreateAuctionPage() {
                       whileHover={{ y: -2 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
-                        <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                      <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden border border-gray-800">
+                        <CardHeader className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700">
                           <CardTitle className="flex items-center gap-3 text-xl">
                             <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl">
                               <ImageIcon className="w-5 h-5 text-white" />
                             </div>
-                            Auction Image
+                            <span className="text-white">Auction Image</span>
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-gray-300">
                             Upload a high-quality image of your item
                           </CardDescription>
                         </CardHeader>
@@ -604,7 +604,7 @@ export default function CreateAuctionPage() {
                                 <img
                                   src={imagePreview}
                                   alt="Preview"
-                                  className="w-full h-56 object-cover rounded-xl border-2 border-gray-200 shadow-lg"
+                                  className="w-full h-56 object-cover rounded-xl border-2 border-gray-600 shadow-lg"
                                 />
                                 <Button
                                   type="button"
@@ -618,18 +618,18 @@ export default function CreateAuctionPage() {
                               </motion.div>
                             ) : (
                               <motion.div
-                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-rose-400 hover:bg-rose-50/50 transition-all duration-300"
+                                className="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-900/10 transition-all duration-300"
                                 onClick={() => fileInputRef.current?.click()}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                               >
-                                <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                   <Upload className="w-8 h-8 text-white" />
                                 </div>
-                                <p className="text-gray-700 font-medium mb-2">
+                                <p className="text-white font-medium mb-2">
                                   Click to upload or drag and drop
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-400">
                                   PNG, JPG, JPEG up to 10MB
                                 </p>
                               </motion.div>
@@ -647,7 +647,7 @@ export default function CreateAuctionPage() {
                               type="button"
                               variant="outline"
                               onClick={() => fileInputRef.current?.click()}
-                              className="w-full h-12 text-base border-2 rounded-xl hover:bg-gray-50"
+                              className="w-full h-12 text-base border-2 rounded-xl hover:bg-gray-800/50 bg-gray-800/30 border-gray-600 text-gray-300 hover:border-gray-500"
                             >
                               <Upload className="w-4 h-4 mr-2" />
                               {imagePreview ? 'Change Image' : 'Upload Image'}
@@ -662,12 +662,12 @@ export default function CreateAuctionPage() {
                       whileHover={{ y: -2 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl overflow-hidden">
+                      <Card className="border-0 shadow-2xl bg-gray-900/95 backdrop-blur-lg rounded-2xl overflow-hidden border border-gray-800">
                         <CardContent className="p-6">
                           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                             <Button
                               type="submit"
-                              className="w-full h-16 text-lg bg-gradient-to-r from-rose-500 via-pink-600 to-purple-700 hover:from-rose-600 hover:via-pink-700 hover:to-purple-800 text-white font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 rounded-2xl"
+                              className="w-full h-16 text-lg bg-gradient-to-r from-emerald-500 via-green-600 to-teal-700 hover:from-emerald-600 hover:via-green-700 hover:to-teal-800 text-white font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 rounded-2xl"
                               disabled={isSubmitting}
                             >
                               {isSubmitting ? (
@@ -688,7 +688,7 @@ export default function CreateAuctionPage() {
                               )}
                             </Button>
                           </motion.div>
-                          <p className="text-sm text-gray-500 text-center mt-4">
+                          <p className="text-sm text-gray-400 text-center mt-4">
                             By creating this auction, you agree to our terms and conditions
                           </p>
                         </CardContent>
@@ -710,9 +710,9 @@ export default function CreateAuctionPage() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="absolute top-20 right-20 w-20 h-20 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center shadow-2xl"
+        className="absolute top-20 right-20 w-20 h-20 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl"
       >
-        <Star className="w-10 h-10 text-amber-800" />
+        <Star className="w-10 h-10 text-white" />
       </motion.div>
 
       <motion.div
@@ -722,9 +722,9 @@ export default function CreateAuctionPage() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="absolute bottom-20 left-20 w-16 h-16 bg-gradient-to-r from-violet-400 to-purple-400 rounded-full flex items-center justify-center shadow-2xl"
+        className="absolute bottom-20 left-20 w-16 h-16 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-2xl"
       >
-        <Zap className="w-8 h-8 text-violet-800" />
+        <Zap className="w-8 h-8 text-white" />
       </motion.div>
     </div>
   );
