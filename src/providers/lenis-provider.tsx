@@ -18,12 +18,10 @@ export default function LenisProvider({ children }: LenisProviderProps) {
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      smoothTouch: false,
       wheelMultiplier: 1,
       touchMultiplier: 2,
       infinite: false,
       autoResize: true,
-      __experimental__naiveDimensions: false,
     });
 
     // Request animation frame loop

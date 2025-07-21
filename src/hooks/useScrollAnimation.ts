@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useInView, useMotionValue, useTransform } from "framer-motion";
 
 interface UseScrollAnimationProps {
   threshold?: number;
@@ -15,9 +15,7 @@ export function useScrollAnimation({
 }: UseScrollAnimationProps = {}) {
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { 
-    threshold, 
     once: triggerOnce,
-    margin: rootMargin 
   });
 
   return { ref, isInView };
@@ -85,4 +83,4 @@ export function useSmoothReveal() {
   }, []);
 
   return { ref, isVisible };
-} 
+}
