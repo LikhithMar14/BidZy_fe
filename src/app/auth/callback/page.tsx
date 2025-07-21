@@ -176,11 +176,11 @@ function AuthCallbackContent() {
   }, [processAuth])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-500 via-pink-600 to-purple-700 flex items-center justify-center">
-      <div className="text-center text-white">
-        <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" />
-        <h2 className="text-2xl font-semibold mb-2">Completing Authentication</h2>
-        <p className="text-rose-100">Please wait while we sign you in...</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-pink-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
+        <h2 className="text-2xl font-semibold mb-2 text-gray-800">Completing Authentication</h2>
+        <p className="text-gray-600">Please wait while we sign you in...</p>
       </div>
     </div>
   )
@@ -188,11 +188,11 @@ function AuthCallbackContent() {
 
 function AuthCallbackLoading() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-500 via-pink-600 to-purple-700 flex items-center justify-center">
-      <div className="text-center text-white">
-        <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" />
-        <h2 className="text-2xl font-semibold mb-2">Loading...</h2>
-        <p className="text-rose-100">Preparing authentication...</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-pink-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
+        <h2 className="text-2xl font-semibold mb-2 text-gray-800">Loading...</h2>
+        <p className="text-gray-600">Preparing authentication...</p>
       </div>
     </div>
   )

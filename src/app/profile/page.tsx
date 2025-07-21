@@ -307,7 +307,7 @@ const AuctionCard = ({ auction, type }: AuctionCardProps) => (
 );
 
 interface BidCardProps {
-  bid: Bid;
+  bid: Bid | any; // Allow for different bid formats
 }
 
 const BidCard = ({ bid }: BidCardProps) => (
@@ -325,15 +325,15 @@ const BidCard = ({ bid }: BidCardProps) => (
             </div>
             <div>
               <p className="font-semibold text-white">₹{bid.amount.toLocaleString('en-IN')}</p>
-              <p className="text-sm text-gray-300">Bid ID: {bid.bid_id.slice(0, 8)}...</p>
+              <p className="text-sm text-gray-300">Bid ID: {(bid.bid_id || bid.id || "").toString().slice(0, 8)}...</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-400">
-              {new Date(bid.created_at || "").toLocaleDateString()}
+              {new Date(bid.created_at || bid.createdAt || "").toLocaleDateString()}
             </p>
             <p className="text-xs text-gray-500">
-              {new Date(bid.created_at || "").toLocaleTimeString()}
+              {new Date(bid.created_at || bid.createdAt || "").toLocaleTimeString()}
             </p>
           </div>
         </div>
@@ -808,7 +808,7 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     {userBids.map((bid: any, index: number) => (
                       <motion.div
-                        key={bid.id || `bid-${index}`}
+                        key={bid.bid_id || bid.id || `bid-${index}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
